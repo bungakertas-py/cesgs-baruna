@@ -1,6 +1,6 @@
 """Sekali jalan: bikin garis pantai domain (0-360) dari world_countries.geojson.
 
-Sumber = geojson dunia milik kertas-cuaca (Natural Earth). Dipotong ke domain di
+Sumber = geojson dunia milik CESGS Nimbus (Natural Earth). Dipotong ke domain di
 DUA belahan (timur 30..180, barat -180..-70) lalu belahan barat digeser +360,
 sehingga hasil ada di frame 0-360 kontinu (30..290) TANPA artefak garis nyebrang
 antimeridian/prime-meridian. Output frontend/data/coast.geojson (kecil), di-commit.
@@ -16,8 +16,8 @@ from shapely.ops import unary_union
 
 from . import config as C
 
-# Sumber geojson dunia (punya kertas-cuaca; dev-time saja, tak perlu di repo ini)
-SRC = os.path.join(os.path.dirname(C.ROOT), "kertas-cuaca", "frontend", "data", "world_countries.geojson")
+# Sumber geojson dunia (punya CESGS Nimbus; dev-time saja, tak perlu di repo ini)
+SRC = os.path.join(os.path.dirname(C.ROOT), "CESGS-Nimbus", "frontend", "data", "world_countries.geojson")
 OUT = os.path.join(C.ROOT, "frontend", "data", "coast.geojson")
 SIMPLIFY = 0.04  # derajat, perkecil ukuran
 

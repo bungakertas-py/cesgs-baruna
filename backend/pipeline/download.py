@@ -12,7 +12,7 @@ from urllib3.util.retry import Retry
 from . import config as C
 
 _SESSION = requests.Session()
-_SESSION.headers.update({"User-Agent": "kertas-fenomena/0.2 (climate monitor)"})
+_SESSION.headers.update({"User-Agent": "cesgs-baruna/0.2 (climate monitor)"})
 _RETRY = Retry(total=5, connect=5, read=5, backoff_factor=2,
                status_forcelist=[408, 429, 500, 502, 503, 504], raise_on_status=False)
 _ADAPTER = HTTPAdapter(max_retries=_RETRY)

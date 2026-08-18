@@ -1,4 +1,4 @@
-name: Deploy Kertas Fenomena
+name: Deploy CESGS Baruna
 
 on:
   push:

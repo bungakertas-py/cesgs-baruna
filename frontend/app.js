@@ -1,4 +1,4 @@
-/* ===== Kertas Fenomena v2 — GFS (SST / Anomali / Klimatologi / Indeks) ===== */
+/* ===== CESGS Baruna v2 — GFS (SST / Anomali / Klimatologi / Indeks) ===== */
 "use strict";
 
 const DATA = "data/output/climate.json";
@@ -59,16 +59,17 @@ map.createPane("boxes"); map.getPane("boxes").style.zIndex = 460; map.getPane("b
 map.createPane("zones"); map.getPane("zones").style.zIndex = 462;   // zona indeks yang bisa diklik (pointerEvents default: auto)
 
 // Basemap di lapisan BAWAH: cuma kelihatan di DARAT (laut ketutup data transparan di pantai).
-// Terang (OSM) untuk kebanyakan layer; GELAP (CARTO dark) KHUSUS anomali (palet seismic pusat putih).
-const BASE_LIGHT = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+// SELALU gelap sekarang, mengikuti gaya Atmospheric Glass versi gelap. Panel kaca
+// dan teks terang butuh latar gelap, dan palet anomali juga lebih kebaca di atasnya.
 const BASE_DARK = "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png";
+const BASE_LIGHT = BASE_DARK;
 L.control.attribution({ prefix: false, position: "bottomright" }).addTo(map);
-const baseTile = L.tileLayer(BASE_LIGHT, {
+const baseTile = L.tileLayer(BASE_DARK, {
   pane: "basemap", subdomains: "abc", crossOrigin: true, maxZoom: 19,
   attribution: "© OpenStreetMap contributors, © CARTO",
 }).addTo(map);
 function applyBasemap() {
-  const url = activeLayer === "anom" ? BASE_DARK : BASE_LIGHT;   // basemap gelap hanya untuk layer anomali
+  const url = BASE_DARK;   // semua layer pakai basemap gelap
   if (baseTile._url !== url) baseTile.setUrl(url);
 }
 
@@ -190,7 +191,7 @@ function setZones(on) {
 }
 
 /* ---- Arus laut (Copernicus): velocity partikel SELALU nyala di semua parameter
-   (konsep sama angin kertas-cuaca); layer "Arus Laut" tambah kontur kecepatan. ---- */
+   (konsep sama angin CESGS Nimbus); layer "Arus Laut" tambah kontur kecepatan. ---- */
 let currentLayer = null, curCache = {};
 function frameDateOf(f) {
   if (!f) return null;
@@ -405,10 +406,10 @@ function sparkPoints(vals, w, h) {
   return vals.map((v, i) => `${(vals.length === 1 ? w / 2 : (i / (vals.length - 1)) * w).toFixed(1)},${(pad + (1 - (v - lo) / (hi - lo)) * (h - 2 * pad)).toFixed(1)}`).join(" ");
 }
 function ninoStatus(v) { return v >= 0.5 ? "El Nino" : v <= -0.5 ? "La Nina" : "Netral"; }
-const INDEX_COLOR = { nino12: NINO_COLORS.nino12, nino3: NINO_COLORS.nino3, nino34: NINO_COLORS.nino34, nino4: NINO_COLORS.nino4, oni: "#7048e8", dmi: "#e64980" };
+const INDEX_COLOR = { nino12: NINO_COLORS.nino12, nino3: NINO_COLORS.nino3, nino34: NINO_COLORS.nino34, nino4: NINO_COLORS.nino4, oni: "#b197fc", dmi: "#e64980" };
 const INDEX_LABEL = { nino12: "Nino 1+2", nino3: "Nino 3", nino34: "Nino 3.4", nino4: "Nino 4", oni: "ONI", dmi: "DMI" };
-const OBS_COLOR = "#1b5e9c", GFS_COLOR = "#e8590c";
-const SINTEX_COLOR = "#2f9e44", SINTEX_FILL = "rgba(47,158,68,.16)";
+const OBS_COLOR = "#4dabf7", GFS_COLOR = "#ff922b";
+const SINTEX_COLOR = "#51cf66", SINTEX_FILL = "rgba(81,207,102,.20)";
 function zoneKeyOf(k) { return k === "dmi" ? "iod" : k === "oni" ? "nino34" : k; }
 function thrOf(k) { return k === "dmi" ? (state.iod_thresh || 0.4) : (state.enso_thresh || 0.5); }
 function zoneTone(v, thr) { if (v == null || isNaN(v)) return "rgba(120,120,120,.45)"; if (v >= thr) return "rgba(214,96,77,.55)"; if (v <= -thr) return "rgba(33,102,172,.55)"; return "rgba(110,120,130,.4)"; }
@@ -459,11 +460,11 @@ function indexPlotSVG(key) {
   // pita zona (latar): hangat / netral / dingin
   const wB = cY(thr), cT = cY(-thr);
   let bands = "";
-  if (wB > yTop) bands += `<rect x="${padL}" y="${yTop}" width="${pw}" height="${(wB - yTop).toFixed(1)}" fill="rgba(214,96,77,.10)"/>`;
-  if (cT > wB) bands += `<rect x="${padL}" y="${wB.toFixed(1)}" width="${pw}" height="${(cT - wB).toFixed(1)}" fill="rgba(110,120,130,.05)"/>`;
-  if (yBot > cT) bands += `<rect x="${padL}" y="${cT.toFixed(1)}" width="${pw}" height="${(yBot - cT).toFixed(1)}" fill="rgba(33,102,172,.10)"/>`;
+  if (wB > yTop) bands += `<rect x="${padL}" y="${yTop}" width="${pw}" height="${(wB - yTop).toFixed(1)}" fill="rgba(255,138,128,.14)"/>`;
+  if (cT > wB) bands += `<rect x="${padL}" y="${wB.toFixed(1)}" width="${pw}" height="${(cT - wB).toFixed(1)}" fill="rgba(255,255,255,.05)"/>`;
+  if (yBot > cT) bands += `<rect x="${padL}" y="${cT.toFixed(1)}" width="${pw}" height="${(yBot - cT).toFixed(1)}" fill="rgba(124,196,255,.12)"/>`;
   const hline = (v, st, dash) => { const y = Y(v); return (y < yTop || y > yBot) ? "" : `<line x1="${padL}" y1="${y.toFixed(1)}" x2="${padL + pw}" y2="${y.toFixed(1)}" stroke="${st}" stroke-width="1"${dash ? ' stroke-dasharray="3 3"' : ""}/>`; };
-  const guides = hline(0, "rgba(28,27,27,.35)", false) + hline(thr, "rgba(214,96,77,.5)", true) + hline(-thr, "rgba(33,102,172,.5)", true);
+  const guides = hline(0, "rgba(255,255,255,.30)", false) + hline(thr, "rgba(214,96,77,.5)", true) + hline(-thr, "rgba(124,196,255,.55)", true);
   const poly = (s) => {
     const d = s.data.filter((p) => p.v != null && !isNaN(p.v)); if (!d.length) return "";
     const pl = `<polyline points="${d.map((p) => `${X(p.x).toFixed(1)},${Y(p.v).toFixed(1)}`).join(" ")}" fill="none" stroke="${s.color}" stroke-width="2"${s.dash ? ' stroke-dasharray="4 3"' : ""} stroke-linejoin="round" stroke-linecap="round"/>`;
@@ -477,7 +478,7 @@ function indexPlotSVG(key) {
     const obs = series[0].data.filter((p) => p.v != null), gfs = series[1].data.filter((p) => p.v != null);
     if (obs.length && gfs.length) {
       const a = obs[obs.length - 1], b = gfs[0], sx = (X(a.x) + X(b.x)) / 2, yA = Y(a.v), yB = Y(b.v);
-      seam = `<line x1="${X(a.x).toFixed(1)}" y1="${yA.toFixed(1)}" x2="${X(b.x).toFixed(1)}" y2="${yB.toFixed(1)}" stroke="rgba(28,27,27,.3)" stroke-width="1" stroke-dasharray="2 2"/>` +
+      seam = `<line x1="${X(a.x).toFixed(1)}" y1="${yA.toFixed(1)}" x2="${X(b.x).toFixed(1)}" y2="${yB.toFixed(1)}" stroke="rgba(255,255,255,.26)" stroke-width="1" stroke-dasharray="2 2"/>` +
         `<rect x="${(sx - 3).toFixed(1)}" y="${Math.min(yA, yB).toFixed(1)}" width="6" height="${Math.max(1, Math.abs(yA - yB)).toFixed(1)}" fill="${zoneTone((a.v + b.v) / 2, thr)}"/>`;
     }
   }
@@ -501,7 +502,7 @@ function indexPlotSVG(key) {
     xaxis = days.map((x, i) => {
       const dt = new Date(x * 864e5), dd = dt.getUTCDate(), mo = dt.getUTCMonth() + 1;
       const xx = X(x), anch = i === 0 ? "start" : i === days.length - 1 ? "end" : "middle";
-      return `<line x1="${xx.toFixed(1)}" y1="${yBot}" x2="${xx.toFixed(1)}" y2="${(yBot + 3).toFixed(1)}" stroke="rgba(28,27,27,.4)" stroke-width="1"/><text x="${xx.toFixed(1)}" y="${H - 8}" text-anchor="${anch}" class="ix-axl">${dd}/${mo}</text>`;
+      return `<line x1="${xx.toFixed(1)}" y1="${yBot}" x2="${xx.toFixed(1)}" y2="${(yBot + 3).toFixed(1)}" stroke="rgba(255,255,255,.32)" stroke-width="1"/><text x="${xx.toFixed(1)}" y="${H - 8}" text-anchor="${anch}" class="ix-axl">${dd}/${mo}</text>`;
     }).join("");
   }
   return `<svg class="ix-plot-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">${bands}${guides}${seam}${lines}${nowm}${yaxis}${xaxis}</svg>`;
@@ -529,11 +530,11 @@ function seasonPlotSVG(key) {
   const cY = (v) => Math.max(yTop, Math.min(yBot, Y(v)));
   const wB = cY(thr), cT = cY(-thr);
   let bands = "";
-  if (wB > yTop) bands += `<rect x="${padL}" y="${yTop}" width="${pw}" height="${(wB - yTop).toFixed(1)}" fill="rgba(214,96,77,.10)"/>`;
-  if (cT > wB) bands += `<rect x="${padL}" y="${wB.toFixed(1)}" width="${pw}" height="${(cT - wB).toFixed(1)}" fill="rgba(110,120,130,.05)"/>`;
-  if (yBot > cT) bands += `<rect x="${padL}" y="${cT.toFixed(1)}" width="${pw}" height="${(yBot - cT).toFixed(1)}" fill="rgba(33,102,172,.10)"/>`;
+  if (wB > yTop) bands += `<rect x="${padL}" y="${yTop}" width="${pw}" height="${(wB - yTop).toFixed(1)}" fill="rgba(255,138,128,.14)"/>`;
+  if (cT > wB) bands += `<rect x="${padL}" y="${wB.toFixed(1)}" width="${pw}" height="${(cT - wB).toFixed(1)}" fill="rgba(255,255,255,.05)"/>`;
+  if (yBot > cT) bands += `<rect x="${padL}" y="${cT.toFixed(1)}" width="${pw}" height="${(yBot - cT).toFixed(1)}" fill="rgba(124,196,255,.12)"/>`;
   const hline = (v, st, dash) => { const y = Y(v); return (y < yTop || y > yBot) ? "" : `<line x1="${padL}" y1="${y.toFixed(1)}" x2="${padL + pw}" y2="${y.toFixed(1)}" stroke="${st}" stroke-width="1"${dash ? ' stroke-dasharray="3 3"' : ""}/>`; };
-  const guides = hline(0, "rgba(28,27,27,.35)", false) + hline(thr, "rgba(214,96,77,.5)", true) + hline(-thr, "rgba(33,102,172,.5)", true);
+  const guides = hline(0, "rgba(255,255,255,.30)", false) + hline(thr, "rgba(214,96,77,.5)", true) + hline(-thr, "rgba(124,196,255,.55)", true);
   let band = "";
   const b = sFc.filter((r) => r.lo != null && r.hi != null);
   if (b.length >= 2) {
@@ -562,7 +563,7 @@ function seasonPlotSVG(key) {
     const ym = months[mi], xx = X(dnum(ym + "15")), mo = +ym.slice(4, 6), yr = ym.slice(2, 4);
     const lab = (mo === 1 || mi === 0) ? `${MONTHS[mo - 1]} ${yr}` : MONTHS[mo - 1];
     const anch = mi === 0 ? "start" : mi === nm - 1 ? "end" : "middle";
-    return `<line x1="${xx.toFixed(1)}" y1="${yBot}" x2="${xx.toFixed(1)}" y2="${(yBot + 3).toFixed(1)}" stroke="rgba(28,27,27,.4)" stroke-width="1"/><text x="${xx.toFixed(1)}" y="${H - 8}" text-anchor="${anch}" class="ix-axl">${lab}</text>`;
+    return `<line x1="${xx.toFixed(1)}" y1="${yBot}" x2="${xx.toFixed(1)}" y2="${(yBot + 3).toFixed(1)}" stroke="rgba(255,255,255,.32)" stroke-width="1"/><text x="${xx.toFixed(1)}" y="${H - 8}" text-anchor="${anch}" class="ix-axl">${lab}</text>`;
   }).join("");
   return `<svg class="ix-plot-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">${bands}${guides}${band}${lines}${nowm}${yaxis}${xaxis}</svg>`;
 }
@@ -743,13 +744,13 @@ function pointPlotSVG(nums, param, curIdx, pd) {
   const ax = niceAxis(vlo, vhi); vlo = ax.lo; vhi = ax.hi;
   const X = (i) => padL + (n === 1 ? pw / 2 : i / (n - 1) * pw);
   const Y = (v) => padT + (1 - (v - vlo) / (vhi - vlo)) * ph;
-  const zero = (param.signed && 0 >= vlo && 0 <= vhi) ? `<line x1="${padL}" y1="${Y(0).toFixed(1)}" x2="${padL + pw}" y2="${Y(0).toFixed(1)}" stroke="rgba(28,27,27,.3)" stroke-width="1"/>` : "";
+  const zero = (param.signed && 0 >= vlo && 0 <= vhi) ? `<line x1="${padL}" y1="${Y(0).toFixed(1)}" x2="${padL + pw}" y2="${Y(0).toFixed(1)}" stroke="rgba(255,255,255,.26)" stroke-width="1"/>` : "";
   const pts = nums.map((v, i) => (v == null || isNaN(v)) ? null : `${X(i).toFixed(1)},${Y(v).toFixed(1)}`).filter(Boolean).join(" ");
   const line = `<polyline points="${pts}" fill="none" stroke="${param.color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
   const ci = Math.min(curIdx, n - 1), cv = nums[ci], nxp = X(ci);
   const nowm = `<line x1="${nxp.toFixed(1)}" y1="${yTop}" x2="${nxp.toFixed(1)}" y2="${yBot}" stroke="#f59f00" stroke-width="1.5"/>` +
     (cv != null && !isNaN(cv) ? `<circle cx="${nxp.toFixed(1)}" cy="${Y(cv).toFixed(1)}" r="2.8" fill="${param.color}" stroke="#fff" stroke-width="1"/>` : "");
-  const AX = "rgba(28,27,27,.55)";
+  const AX = "rgba(255,255,255,.45)";
   const axisLines = `<line x1="${padL}" y1="${yTop}" x2="${padL}" y2="${yBot}" stroke="${AX}" stroke-width="1"/><line x1="${padL}" y1="${yBot}" x2="${(padL + pw).toFixed(1)}" y2="${yBot}" stroke="${AX}" stroke-width="1"/>`;
   const yfmt = (v) => param.signed ? (Math.abs(v) < 1e-9 ? (0).toFixed(ax.dec) : (v > 0 ? "+" : "") + v.toFixed(ax.dec)) : v.toFixed(ax.dec);
   const yaxis = ax.ticks.map((v) => `<line x1="${padL - 3}" y1="${Y(v).toFixed(1)}" x2="${padL}" y2="${Y(v).toFixed(1)}" stroke="${AX}" stroke-width="1"/><text x="${padL - 5}" y="${(Y(v) + 3).toFixed(1)}" text-anchor="end" class="kf-axl">${yfmt(v)}</text>`).join("");
@@ -822,9 +823,11 @@ map.on("popupclose", (e) => {
 map.on("click", (e) => { if (activeLayer !== "index") openPoint(e.latlng.lat, e.latlng.lng); });
 
 /* ---- Timeline ---- */
+// Porsi jalur yang terisi dikirim ke CSS lewat variabel --fill; warnanya
+// (gradasi biru ke violet) diatur di style.css, bukan di sini.
 function updateRangeFill() {
   const sl = $("time-slider"), pct = sl.max > 0 ? (sl.value / sl.max) * 100 : 0;
-  sl.style.background = `linear-gradient(90deg,var(--lime) ${pct}%,var(--surface-low) ${pct}%)`;
+  sl.style.setProperty("--fill", pct.toFixed(2) + "%");
 }
 function afterFrame() { if (activeLayer === "index") { renderIndexDetail(); renderIndexPlot(); } }
 $("time-slider").addEventListener("input", (e) => { if (playing) togglePlay(); showFrame(+e.target.value); afterFrame(); });
@@ -859,13 +862,8 @@ $("pt-off").addEventListener("click", () => {
   else { openIndex(false); $("pt-reopen").classList.remove("show"); }
 });
 
-/* ---- Tentang ---- */
-const aboutOverlay = $("about-overlay");
+/* ---- Pindah antar-app ---- */
 $("nav-arrow").addEventListener("click", () => $("nav-arrow").closest(".brand-row").classList.toggle("nav-open"));
-$("about-btn").addEventListener("click", () => aboutOverlay.classList.add("show"));
-$("about-close").addEventListener("click", () => aboutOverlay.classList.remove("show"));
-aboutOverlay.addEventListener("click", (e) => { if (e.target === aboutOverlay) aboutOverlay.classList.remove("show"); });
-document.addEventListener("keydown", (e) => { if (e.key === "Escape") aboutOverlay.classList.remove("show"); });
 
 /* ---- Kontrol lain ---- */
 $("zoom-in").addEventListener("click", () => map.zoomIn());
@@ -878,7 +876,7 @@ $("fs-btn").addEventListener("click", () => {
 });
 $("zones-btn").addEventListener("click", () => setZones(!zonesOn));
 $("share-btn").addEventListener("click", async () => {
-  try { if (navigator.share) await navigator.share({ title: "Kertas Fenomena", url: location.href }); else { await navigator.clipboard.writeText(location.href); toast("Link disalin"); } } catch (_) {}
+  try { if (navigator.share) await navigator.share({ title: "CESGS Baruna", url: location.href }); else { await navigator.clipboard.writeText(location.href); toast("Link disalin"); } } catch (_) {}
 });
 function toast(m) { const t = $("toast"); t.textContent = m; t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 1800); }
 $("ctrl-toggle").addEventListener("click", (e) => e.currentTarget.parentElement.classList.toggle("ctrl-open"));

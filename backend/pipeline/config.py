@@ -1,4 +1,4 @@
-"""Konfigurasi pipeline Kertas Fenomena v2 (PIVOT ke GFS).
+"""Konfigurasi pipeline CESGS Baruna v2 (PIVOT ke GFS).
 
 Sumber:
 - SST realtime: GFS (NOMADS filter) `TMP:surface` di laut (mask `LAND:surface`), per 3 jam.

@@ -1,7 +1,7 @@
-# Kertas Fenomena - Design Brief
+# CESGS Baruna - Design Brief
 
-Turunan iklim dari Kertas Cuaca. Fokus: mode iklim skala besar (bukan cuaca titik).
-Acuan visual: gaya neubrutalist Kertas Cuaca (border ink 3px, hard-shadow tanpa blur,
+Turunan iklim dari CESGS Nimbus. Fokus: mode iklim skala besar (bukan cuaca titik).
+Acuan visual: gaya neubrutalist CESGS Nimbus (border ink 3px, hard-shadow tanpa blur,
 biru #0029d7 + lime #d2ed26, font Archivo Black / Space Grotesk / JetBrains Mono).
 
 ## Keputusan (disepakati 2026-08-05)
@@ -10,7 +10,7 @@ biru #0029d7 + lime #d2ed26, font Archivo Black / Space Grotesk / JetBrains Mono
    Kita TIDAK bikin prakiraan musiman sendiri (CFSv2 = Fase 2 opsional, berat).
 2. **Lapis iklim global = resolusi 1 derajat** (mode planet, tak butuh halus).
 3. **Arsitektur dua lapis** (lihat bawah).
-4. **Repo baru terpisah**, akun personal, live sendiri. Tidak menimpa kertas-cuaca.
+4. **Repo baru terpisah**, akun personal, live sendiri. Tidak menimpa CESGS-Nimbus.
 
 ## Prinsip inti
 
@@ -19,7 +19,7 @@ biru #0029d7 + lime #d2ed26, font Archivo Black / Space Grotesk / JetBrains Mono
   resmi lembaga lain. GFS tidak bisa memprakirakan mode laut.
 - **Anomali**: semua mode iklim = selisih dari normal. Butuh baseline klimatologi
   (mis. 1991-2020) di-bundle sekali sebagai aset statis.
-- **Frame awal tetap fokus Indonesia** (VIEW_CORE seperti kertas-cuaca), data diperluas.
+- **Frame awal tetap fokus Indonesia** (VIEW_CORE seperti CESGS-Nimbus), data diperluas.
 
 ## Domain
 
@@ -32,7 +32,7 @@ biru #0029d7 + lime #d2ed26, font Archivo Black / Space Grotesk / JetBrains Mono
 
 1. **Lapis IKLIM (global, 1 derajat)**: SST + anomali SST, OLR, angin 850 & 200,
    untuk ENSO, IOD, MJO. Frame sedikit (kini + langkah harian s/d 10-16 hari).
-2. **Lapis CUACA (regional, 0.25 derajat)**: domain mirip kertas-cuaca (boleh dilebarkan),
+2. **Lapis CUACA (regional, 0.25 derajat)**: domain mirip CESGS-Nimbus (boleh dilebarkan),
    untuk ITCZ, Monsun, Cold Surge, Borneo Vortex, Siklon Tropis.
 3. **Indeks** (ONI/Niño3.4, DMI, RMM): file teks/JSON mungil. Niño & DMI dihitung sendiri
    dari SST; RMM ditumpang dari BoM.
@@ -60,7 +60,7 @@ QBO = opsional, sebenarnya relevan untuk MJO.)
 
 ## Sumber data (gratis, otomatis)
 
-- GFS 0.25 (NOMADS) - atmosfer, sudah dipakai kertas-cuaca.
+- GFS 0.25 (NOMADS) - atmosfer, sudah dipakai CESGS-Nimbus.
 - NOAA OISST v2.1 daily - SST untuk ENSO/IOD (butuh netCDF/xarray).
 - NOAA interpolated OLR (PSL) - MJO/konveksi (atau ULWRF dari GFS).
 - Indeks teks: ONI/Niño3.4 (CPC), DMI, RMM (BoM). Kecil.
@@ -69,7 +69,7 @@ QBO = opsional, sebenarnya relevan untuk MJO.)
 ## Risiko / catatan CI
 
 - Dependency baru (xarray, netCDF4, mungkin windspharm) WAJIB masuk requirements.txt
-  (pelajaran contourpy di kertas-cuaca).
+  (pelajaran contourpy di CESGS-Nimbus).
 - Sumber non-GFS lebih rawan gagal di Actions, perlu retry/fallback.
 - Update harian sudah cukup, mode iklim bergerak lambat.
 
