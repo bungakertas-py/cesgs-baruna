@@ -864,6 +864,19 @@ $("pt-off").addEventListener("click", () => {
 
 /* ---- Pindah antar-app ---- */
 $("nav-arrow").addEventListener("click", () => $("nav-arrow").closest(".brand-row").classList.toggle("nav-open"));
+// Kartu Tentang: buka lewat tombol info, tutup lewat silang, klik latar, atau Esc.
+{
+  const aboutBox = $("about-overlay");
+  const setAbout = (on) => {
+    if (!aboutBox) return;
+    aboutBox.classList.toggle("show", on);
+    aboutBox.setAttribute("aria-hidden", on ? "false" : "true");
+  };
+  $("about-btn")?.addEventListener("click", () => setAbout(true));
+  $("about-close")?.addEventListener("click", () => setAbout(false));
+  aboutBox?.addEventListener("click", (e) => { if (e.target === aboutBox) setAbout(false); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") setAbout(false); });
+}
 
 /* ---- Kontrol lain ---- */
 $("zoom-in").addEventListener("click", () => map.zoomIn());
