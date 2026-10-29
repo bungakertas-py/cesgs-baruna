@@ -3,52 +3,31 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-  <title>CESGS Baruna — Pemantau Iklim Laut Indonesia</title>
+  <title>CESGS Baruna — Angin, Arus, Gelombang</title>
   <link rel="icon" type="image/png" href="cesgs-mark.png" />
-  <meta name="description" content="Pemantau iklim laut Indonesia: SST, anomali SST, klimatologi, dan indeks ENSO (Nino 1+2/3/3.4/4, ONI) & IOD (DMI) dari model laut CMEMS." />
+  <meta name="description" content="Peta laut Indonesia: angin, arus, dan gelombang (kontur + partikel) dari model global GFS dan CMEMS." />
   <meta name="theme-color" content="#0a1018" />
-  <!-- Open Graph / kartu preview saat link dibagikan -->
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="CESGS Baruna" />
   <meta property="og:title" content="CESGS Baruna — Membaca Gerak Laut" />
-  <meta property="og:description" content="Pemantau iklim laut Indonesia. Suhu muka laut, anomali, arus, salinitas, plus indeks ENSO dan IOD dari model CMEMS." />
-  <meta property="og:url" content="https://bungakertas-py.github.io/cesgs-baruna/" />
-  <meta property="og:image" content="https://bungakertas-py.github.io/cesgs-baruna/og-image.png" />
-  <meta property="og:image:width" content="2400" />
-  <meta property="og:image:height" content="1260" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="CESGS Baruna — Membaca Gerak Laut" />
-  <meta name="twitter:description" content="Pemantau iklim laut Indonesia dari model CMEMS." />
-  <meta name="twitter:image" content="https://bungakertas-py.github.io/cesgs-baruna/og-image.png" />
+  <meta property="og:description" content="Peta laut Indonesia. Angin, arus, dan gelombang dari model global." />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet-velocity@1.7.0/dist/leaflet-velocity.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=r32" />
+  <link rel="stylesheet" href="rute.css?v=r32" />
 </head>
 <body>
   <div id="stage">
     <div id="map"></div>
 
-    <!-- Loading peta saat ganti parameter / frame (raster domain besar): skeleton
-         menutup raster lama, kontrol tetap di atas. Bar tipis untuk scrub/putar. -->
-    <div id="map-loading" aria-hidden="true">
-      <div class="sk-bar ml-fill"></div>
-      <div class="ml-center">
-        <img class="sk-mark" src="cesgs-mark.png" width="60" height="60" alt="" />
-        <div class="sk-load-text" id="map-loading-text">Memuat data…</div>
-      </div>
-    </div>
-    <div id="raster-bar" aria-hidden="true"><span></span></div>
-
     <div id="ui">
       <!-- ============ TOP ============ -->
       <div class="ui-top">
-        <!-- kiri: brand + layer + model -->
         <div class="col">
-          <!-- brand + panah pindah ke CESGS Nimbus (kontainer saudara, geser ke kanan) -->
           <div class="brand-row">
             <div class="panel brand">
               <img class="brand-logo" src="cesgs-mark.png" width="38" height="38" alt="CESGS" />
@@ -57,7 +36,6 @@
                 <span>Membaca Gerak Laut</span>
               </div>
               <button id="about-btn" class="brand-info" aria-label="Tentang aplikasi ini" title="Tentang"><span class="material-symbols-outlined">info</span></button>
-              <button id="nav-arrow" class="nav-arrow" aria-label="Pindah ke CESGS Nimbus" title="CESGS Nimbus"><span class="material-symbols-outlined">chevron_right</span></button>
             </div>
             <a class="sibling-link" href="https://bungakertas-py.github.io/cesgs-nimbus/" title="Buka CESGS Nimbus (peta cuaca interaktif Indonesia)">
               <span class="material-symbols-outlined pl-ico">partly_cloudy_day</span>
@@ -70,119 +48,34 @@
           </div>
 
           <div class="layer-bar">
-            <button id="param-toggle" class="param-toggle" aria-label="Parameter iklim">
-              <span class="material-symbols-outlined param-ico">tune</span>
-              <span class="param-lbl">Parameter</span>
-              <span class="material-symbols-outlined param-caret">expand_more</span>
-            </button>
-            <button id="layer-prev" class="layer-nav" aria-label="Parameter sebelumnya"><span class="material-symbols-outlined">chevron_left</span></button>
             <div class="panel layers">
-              <button class="layer-btn active" data-layer="sst" data-tip="Suhu Laut (permukaan & kedalaman)">
-                <span class="material-symbols-outlined">thermostat</span> <span class="lb-txt">Suhu Laut</span>
+              <button class="layer-btn active" data-layer="arus" data-tip="Arus laut (kontur + partikel)">
+                <span class="material-symbols-outlined">waves</span> <span class="lb-txt">Arus<span class="lb-info" data-info="arus" role="button" tabindex="0" aria-label="Apa itu arus">!</span></span>
               </button>
-              <button class="layer-btn" data-layer="anom" data-tip="Anomali SST">
-                <span class="material-symbols-outlined">trending_up</span> <span class="lb-txt">Anomali SST</span>
-              </button>
-              <button class="layer-btn" data-layer="clim" data-tip="Klimatologi SST">
-                <span class="material-symbols-outlined">calendar_month</span> <span class="lb-txt">Klimatologi SST</span>
-              </button>
-              <button class="layer-btn" data-layer="current" data-tip="Arus Laut">
-                <span class="material-symbols-outlined">waves</span> <span class="lb-txt">Arus Laut</span>
-              </button>
-              <button class="layer-btn" data-layer="sal" data-tip="Salinitas Permukaan">
-                <span class="material-symbols-outlined">water_drop</span> <span class="lb-txt">Salinitas</span>
+              <button class="layer-btn" data-layer="wave" data-tip="Tinggi gelombang (segera hadir)">
+                <span class="material-symbols-outlined">water</span> <span class="lb-txt">Gelombang<span class="lb-info" data-info="wave" role="button" tabindex="0" aria-label="Apa itu gelombang">!</span></span>
               </button>
             </div>
-            <button id="layer-next" class="layer-nav" aria-label="Parameter berikutnya"><span class="material-symbols-outlined">chevron_right</span></button>
-          </div>
-
-          <!-- Pemilih kedalaman (hanya saat layer Suhu Bawah Permukaan) -->
-          <div id="depth-bar" class="depth-bar panel" hidden>
-            <span class="label-caps">Kedalaman</span>
-            <div class="depth-pills" id="depth-pills"></div>
-          </div>
-
-          <div class="index-bar">
-            <button id="index-toggle" class="panel index-toggle" aria-label="Buka daftar indeks iklim">
-              <span class="material-symbols-outlined index-ico">analytics</span>
-              <span class="index-lbl">Indeks Iklim</span>
-              <span class="material-symbols-outlined index-caret">expand_more</span>
-            </button>
-            <div class="panel index-menu">
-              <button class="index-opt" data-ix="nino12">Nino 1+2</button>
-              <button class="index-opt" data-ix="nino3">Nino 3</button>
-              <button class="index-opt" data-ix="nino34">Nino 3.4</button>
-              <button class="index-opt" data-ix="nino4">Nino 4</button>
-              <button class="index-opt" data-ix="oni">ONI</button>
-              <button class="index-opt" data-ix="dmi">DMI</button>
-            </div>
-          </div>
-
-          <!-- Ringkasan awam otomatis: kondisi ENSO/IOD kini + kecenderungan untuk Indonesia -->
-          <div id="climate-brief" class="panel brief-card" hidden>
-            <div class="brief-head">
-              <span class="label-caps">Kondisi Iklim Kini</span>
-              <button id="brief-close" class="brief-close" aria-label="Tutup ringkasan"><span class="material-symbols-outlined">close</span></button>
-            </div>
-            <div class="brief-chips" id="brief-chips"></div>
-            <p class="brief-text" id="brief-text"></p>
           </div>
         </div>
 
-        <!-- kanan: lang + zoom + kontrol -->
         <div class="col items-end">
-          <button id="ctrl-toggle" class="ctrl-toggle" aria-label="Kontrol peta">
-            <span class="material-symbols-outlined ctrl-ico">more_horiz</span>
-            <span class="material-symbols-outlined ctrl-caret">expand_more</span>
-          </button>
-          <div class="lang">
-            <button class="active">ID</button>
-            <button disabled title="Segera">EN</button>
-          </div>
           <div class="zoom">
             <button id="zoom-in" aria-label="Perbesar" data-tip="Perbesar"><span class="material-symbols-outlined">add</span></button>
             <button id="zoom-out" aria-label="Perkecil" data-tip="Perkecil"><span class="material-symbols-outlined">remove</span></button>
           </div>
-          <button id="zones-btn" class="icon-btn" aria-label="Zona indeks" data-tip="Zona Indeks"><span class="material-symbols-outlined">select_all</span></button>
           <button id="share-btn" class="icon-btn" aria-label="Bagikan tampilan ini" data-tip="Bagikan"><span class="material-symbols-outlined">share</span></button>
           <button id="fs-btn" class="icon-btn" aria-label="Layar penuh" data-tip="Layar Penuh"><span class="material-symbols-outlined">fullscreen</span></button>
-
-          <div class="model-wrap">
-            <button id="model-toggle" class="icon-btn" aria-label="Model & sumber data" data-tip="Model & Sumber"><span class="material-symbols-outlined">tune</span></button>
-            <div class="panel selects">
-              <div class="field">
-                <div class="label-caps">MODEL</div>
-                <div class="select-wrap">
-                  <select id="model-select"><option>CMEMS (model laut)</option></select>
-                  <span class="material-symbols-outlined">arrow_drop_down</span>
-                </div>
-              </div>
-              <div class="field">
-                <div class="label-caps">KLIMATOLOGI</div>
-                <div class="select-wrap">
-                  <select id="clim-select" disabled><option>COBE-SST2 1991-2020</option></select>
-                  <span class="material-symbols-outlined">arrow_drop_down</span>
-                </div>
-              </div>
-              <div class="field">
-                <div class="label-caps">MODEL ARUS</div>
-                <div class="select-wrap">
-                  <select id="cur-model-select" disabled><option id="cur-model-opt">Copernicus (CMEMS)</option></select>
-                  <span class="material-symbols-outlined">arrow_drop_down</span>
-                </div>
-              </div>
-            </div>
-          </div>
+          <button id="rute-btn" class="icon-btn" aria-label="Rute pelayaran" data-tip="Rute Pelayaran"><span class="material-symbols-outlined">directions_boat</span></button>
         </div>
       </div>
 
       <!-- ============ BOTTOM: slider (kiri) + legenda (kanan) ============ -->
       <div class="ui-bottom">
         <div class="panel timeline">
-          <div id="data-fresh" class="fresh-badge" title="Waktu data model laut CMEMS">
+          <div id="data-fresh" class="fresh-badge" title="Waktu data model">
             <span class="material-symbols-outlined fresh-ico">error</span>
             <span class="mono" id="fresh-text"></span>
-            <span class="material-symbols-outlined fresh-chev">chevron_right</span>
           </div>
           <div class="tl-btns">
             <button id="play-btn" class="tl-btn" title="Play/Pause"><span class="material-symbols-outlined" id="play-icon">play_arrow</span></button>
@@ -196,7 +89,11 @@
 
         <div class="legend-col">
           <div class="legend-panel">
-            <div class="legend-head mono" id="legend-head">°C</div>
+            <div class="legend-head mono" id="cape-legend-head">Potensi badai · J/kg</div>
+            <div class="legend" id="cape-legend-cells"></div>
+          </div>
+          <div class="legend-panel">
+            <div class="legend-head mono" id="legend-head">m/s</div>
             <div class="legend" id="legend-cells"></div>
           </div>
         </div>
@@ -205,9 +102,15 @@
 
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-    <!-- Skeleton load-awal (menutup seluruh layar sampai raster pertama siap) -->
-    <!-- Kartu Tentang. Identitas lembaga, sumber data, dan penyangkalan.
-         Sengaja tanpa nama perorangan, ini produk lembaga. -->
+    <div id="param-overlay" class="about-overlay" role="dialog" aria-modal="true" aria-labelledby="param-title" aria-hidden="true">
+      <div class="about-card param-card">
+        <button id="param-close" class="about-close" aria-label="Tutup"><span class="material-symbols-outlined">close</span></button>
+        <span class="about-tag">PARAMETER</span>
+        <h2 class="about-name" id="param-title"></h2>
+        <p class="about-intro" id="param-body"></p>
+      </div>
+    </div>
+
     <div id="about-overlay" class="about-overlay" role="dialog" aria-modal="true" aria-labelledby="about-title" aria-hidden="true">
       <div class="about-card">
         <button id="about-close" class="about-close" aria-label="Tutup"><span class="material-symbols-outlined">close</span></button>
@@ -215,72 +118,23 @@
         <div class="about-body">
           <span class="about-tag">TENTANG</span>
           <h2 class="about-name" id="about-title">CESGS Baruna</h2>
-          <p class="about-intro">Suhu, arus, dan indeks iklim laut Indonesia, diolah dari model laut global terbuka dan disajikan supaya bisa dibaca tanpa latar oseanografi. Dikembangkan CESGS Universitas Airlangga.</p>
+          <p class="about-intro">Peta laut Indonesia: angin, arus, dan gelombang, diolah dari model global terbuka dan disajikan supaya bisa dibaca tanpa latar oseanografi. Dikembangkan CESGS Universitas Airlangga.</p>
           <div class="about-meta">
-            <p><span class="material-symbols-outlined">database</span>Sumber data model laut CMEMS Copernicus, terbuka dan gratis.</p>
-            <p><span class="material-symbols-outlined">update</span>Diperbarui otomatis tiap hari pukul 05.00 WIB.</p>
+            <p><span class="material-symbols-outlined">air</span>Angin dari GFS (NOAA). Gelombang dari GFS-Wave (NOAA). Arus dari CMEMS (Copernicus). Semua model global terbuka.</p>
+            <p><span class="material-symbols-outlined">update</span>Data yang tampil masih snapshot contoh untuk pengembangan. Pembaruan otomatis harian sedang disiapkan.</p>
             <p><span class="material-symbols-outlined">shield</span>Untuk pemantauan dan kajian, bukan prakiraan resmi.</p>
           </div>
         </div>
       </div>
     </div>
 
-    <div id="skeleton" aria-hidden="true">
-      <div class="sk-top">
-        <div class="sk-col">
-          <div class="sk-panel sk-brand">
-            <div class="sk-bar sk-logo"></div>
-            <div class="sk-lines">
-              <div class="sk-bar sk-line-lg"></div>
-              <div class="sk-bar sk-line-sm"></div>
-            </div>
-          </div>
-          <div class="sk-panel sk-layers">
-            <div class="sk-bar"></div><div class="sk-bar"></div>
-            <div class="sk-bar"></div><div class="sk-bar"></div>
-          </div>
-          <div class="sk-panel sk-selects">
-            <div class="sk-bar"></div><div class="sk-bar"></div>
-          </div>
-        </div>
-        <div class="sk-col sk-right">
-          <div class="sk-bar sk-mini"></div>
-          <div class="sk-bar sk-mini"></div>
-          <div class="sk-bar sk-mini"></div>
-          <div class="sk-bar sk-mini"></div>
-        </div>
-      </div>
-      <div class="sk-bottom">
-        <div class="sk-bar sk-slider"></div>
-        <div class="sk-bar sk-legend"></div>
-      </div>
-      <div class="sk-center">
-        <img class="sk-mark" src="cesgs-mark.png" width="60" height="60" alt="" />
-        <div class="sk-load-text">Memuat data iklim…</div>
-      </div>
-    </div>
-
-    <div id="loading">Memuat data iklim…</div>
-
-    <!-- Panel Indeks Iklim (memakai gaya #point-panel CESGS Nimbus) -->
-    <aside id="point-panel" class="open">
-      <div class="pt-head">
-        <div class="pt-head-top">
-          <span class="badge badge-lime" id="pt-badge">INDEKS IKLIM</span>
-          <div class="pt-head-btns">
-            <button id="pt-hide" class="pt-close" title="Sembunyikan"><span class="material-symbols-outlined">chevron_right</span></button>
-            <button id="pt-off" class="pt-close" title="Matikan"><span class="material-symbols-outlined">close</span></button>
-          </div>
-        </div>
-        <div class="pt-coords mono" id="ip-status">—</div>
-      </div>
-      <div class="pt-body" id="ip-cards"></div>
-    </aside>
-    <button id="pt-reopen" title="Tampilkan indeks iklim"><span class="material-symbols-outlined">chevron_left</span></button>
+    <div id="loading">Memuat data laut…</div>
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet-velocity@1.7.0/dist/leaflet-velocity.min.js"></script>
-  <script src="app.js"></script>
+  <script src="app.js?v=r32"></script>
+  <script src="fms.js?v=r32"></script>
+  <script src="rute.js?v=r32"></script>
 </body>
 </html>

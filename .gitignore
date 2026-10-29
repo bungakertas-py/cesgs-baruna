@@ -3,8 +3,14 @@ backend/venv/
 __pycache__/
 *.pyc
 
-# Data hasil generate (dibuat ulang oleh GitHub Actions saat deploy)
-frontend/data/output/
+# Data output: snapshot statis di-commit untuk deploy, kecuali file sampah/sementara
+frontend/data/output/*.bak*
+frontend/data/output/*.snapshot*
+frontend/data/output/*.bin.gz
+
+# File scratch/backup editor
+frontend/*.bak
+frontend/_test.html
 
 # GRIB/NetCDF sementara
 *.nc
@@ -24,3 +30,6 @@ frontend/data/terrain.png
 frontend/data/land_10m.geojson
 backend/pipeline/prep_terrain.py
 backend/pipeline/prep_land.py
+
+# Backup data rute
+frontend/data/rute/*.bak

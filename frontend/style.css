@@ -296,21 +296,29 @@ html, body {
 }
 .layer-btn.active .material-symbols-outlined { font-variation-settings: "FILL" 1, "wght" 500; }
 .layer-btn.disabled { opacity: .38; cursor: not-allowed; }
-/* Pil nama parameter, muncul saat hover */
+/* Pil nama parameter: SELALU tampil (tak perlu hover) */
 .layer-btn .lb-txt {
   position: absolute; left: calc(100% + 10px); top: 50%;
-  transform: translateY(-50%) translateX(-8px);
+  transform: translateY(-50%) translateX(0);
   padding: 8px 14px; border-radius: var(--r-full);
   background: var(--glass-strong);
   backdrop-filter: blur(var(--blur-lg)) saturate(1.25); -webkit-backdrop-filter: blur(var(--blur-lg)) saturate(1.25);
   border: 1px solid var(--glass-brd-strong); box-shadow: var(--shadow), var(--rim);
   color: var(--ink); font-family: var(--font-ui); font-weight: 500; font-size: 13px;
-  white-space: nowrap; pointer-events: none; opacity: 0; z-index: 30;
+  white-space: nowrap; pointer-events: none; opacity: 1; z-index: 30;
   transition: opacity .16s ease, transform .16s ease;
 }
-.layer-btn:hover .lb-txt, .layer-btn:focus-visible .lb-txt {
-  opacity: 1; transform: translateY(-50%) translateX(0);
+/* Tanda seru di pil nama: klik buka popup penjelasan awam */
+.lb-info {
+  pointer-events: auto; cursor: pointer;
+  display: inline-grid; place-items: center; vertical-align: middle;
+  width: 16px; height: 16px; margin-left: 7px;
+  border-radius: 50%; border: 1px solid var(--glass-brd);
+  background: var(--fill-2); color: var(--variant);
+  font-family: var(--font-mono); font-weight: 700; font-size: 11px; line-height: 1;
+  transition: background .16s, color .16s, transform .16s;
 }
+.lb-info:hover { background: var(--primary); color: var(--on-primary); transform: scale(1.12); }
 .layer-nav { display: none; }
 
 /* ---- Pemilih kedalaman (layer Suhu Laut & Arus) ---- */
@@ -467,7 +475,7 @@ html, body {
 
 /* ===================== BOTTOM: slider (kiri) + legenda (kanan) ===================== */
 .ui-bottom { display: flex; flex-direction: row; align-items: stretch; gap: 16px; }
-.legend-col { position: relative; align-self: flex-end; }
+.legend-col { position: relative; align-self: flex-end; display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
 
 .timeline { flex: 1; min-width: 0; padding: var(--tl-pad-y) 18px; display: flex; align-items: center; gap: 16px; position: relative; }
 .tl-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
