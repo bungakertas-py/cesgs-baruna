@@ -406,3 +406,312 @@
   .rt-modal-box { width: 94vw; max-width: 94vw; }
   .rt-modal .rt-cards { column-width: auto; column-count: 1; }
 }
+
+/* ===================================================================
+   TATA LETAK BARU, 5 November 2026, mengikuti sketsa tangan pemilik.
+   Panel rute dibelah dua. Formnya jadi SIDEBAR KANAN yang berdiri dari
+   atas sampai bawah, dan grafik sepanjang jalur jadi PANEL BAWAH yang
+   melintang penuh. Dua duanya terbuka sejak halaman dibuka.
+   =================================================================== */
+
+:root { --rt-sidebar: 332px; --rt-tl-h: 262px; }
+
+/* ---- Sidebar kanan ---- */
+#rute-panel {
+  top: 0; right: 0; bottom: 0; left: auto;
+  width: var(--rt-sidebar); max-width: 86vw; max-height: none;
+  border-radius: 0; border: 0; border-left: var(--bw) solid var(--ink-20);
+  background: var(--paper); box-shadow: none;
+  transform: translateX(100%); opacity: 1;
+  transition: transform .28s ease;
+}
+#rute-panel.show { transform: translateX(0); }
+.rt-scroll { padding-bottom: 18px; }
+
+/* ---- Panel time series, melintang di bawah ----
+   Berhenti sebelum sidebar, bukan menyelinap di belakangnya, supaya
+   grafiknya tidak ada yang tertutup. */
+#rt-bawah {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  height: var(--rt-tl-h); padding: 10px 20px 0;
+  background: var(--paper); border-top: var(--bw) solid var(--ink-20);
+  /* overflow DIBIARKAN TERLIHAT. Tombol penyembunyi menempel di tepi atas
+     dengan top negatif, dan overflow apa pun selain visible memotongnya
+     habis tanpa galat. Gulir mendatar dipindah ke #rt-timeline. */
+  overflow: visible;
+  transform: translateY(100%); transition: transform .28s ease;
+  z-index: 690; pointer-events: auto;
+}
+#stage.rute-on #rt-bawah { transform: translateY(0); }
+#stage.rute-on #rt-bawah { right: var(--rt-sidebar); }
+/* Aturan :empty bawaan dimatikan. Panelnya sekarang punya tinggi tetap dan
+   jadi bagian tata letak, jadi dia harus tetap ada walau isinya belum
+   dihitung. Yang kosong diisi pesan oleh tlMsg(). */
+#rt-timeline:empty { display: block; }
+
+/* ---- Chrome peta menggeser supaya tidak tertimpa sidebar ----
+   Bilah waktu dan legenda ikut naik ke atas panel time series. */
+/* Margin bawahnya dikurangi --ui-pad. Aturan reskin memberi bilah ini
+   margin-bottom negatif sebesar padding #ui supaya dia menembus tepi layar.
+   Kalau di sini ditulis tinggi panel apa adanya, padding itu balik lagi dan
+   muncul selarik peta gelap menyelip di antara keduanya. */
+#stage.rute-on .ui-bottom {
+  margin-right: var(--rt-sidebar);
+  margin-bottom: var(--rt-tl-h);
+}
+#stage.rute-on .ui-top .col.items-end { margin-right: var(--rt-sidebar); }
+#stage.rute-on #toast { margin-left: calc(var(--rt-sidebar) / -2); }
+
+@media (max-width: 900px) {
+  /* Di layar sempit sidebar kembali jadi lembar bawah seperti dulu, sebab
+     332px dari layar 400px tidak menyisakan peta sama sekali. */
+  :root { --rt-tl-h: 150px; }
+  #rute-panel {
+    top: auto; left: 0; right: 0; width: 100%; max-width: 100%;
+    max-height: 54vh; border-left: 0; border-top: var(--bw) solid var(--ink-20);
+    transform: translateY(100%);
+  }
+  #rute-panel.show { transform: translateY(0); }
+  #stage.rute-on #rt-bawah { right: 0; bottom: 54vh; }
+  #stage.rute-on .ui-bottom { margin-right: 0; margin-bottom: calc(54vh + var(--rt-tl-h)); }
+  #stage.rute-on .ui-top .col.items-end { margin-right: 0; }
+  #stage.rute-on #toast { margin-left: 0; }
+}
+
+/* Tanggal di bawah slider mengecil waktu sidebar terbuka. Bilahnya kehilangan
+   lebar sebanyak sidebar, dan label 9px untuk 11 hari jadi saling menempel. */
+#stage.rute-on .tl-tick-lbl { font-size: 8px; letter-spacing: -.01em; }
+
+/* Keterangan di panel bawah: satu baris tipis di atas kartu ulasan, bukan
+   paragraf tebal. Di sidebar dulu dia punya ruang tinggi, di sini tidak. */
+#rt-bawah .rt-note {
+  padding: 0 0 8px; margin: 0; font-size: 10px; line-height: 1.5;
+  color: var(--ink-50); font-family: var(--font-ui); font-weight: 200;
+}
+#rt-bawah #rt-timeline { padding: 0; }
+#rt-bawah #rt-timeline:empty { display: block; }
+
+/* Scrim bawah ikut naik ke atas panel rute. Kalau dibiarkan di dasar layar
+   dia berada DI BAWAH panel itu, tidak menyentuh slider sama sekali, dan
+   slider putih berdiri telanjang di atas peta hijau terang. */
+#stage.rute-on .scrim--bawah { bottom: var(--rt-tl-h); }
+@media (max-width: 900px) {
+  #stage.rute-on .scrim--bawah { bottom: calc(54vh + var(--rt-tl-h)); }
+}
+
+/* ===================================================================
+   FORM SIDEBAR: BENTO GRID + MEDAN BERGARIS BAWAH
+   5 November 2026, diminta pemilik. Dua perubahan sekaligus.
+
+   Satu, kotak dibuang. Tiap isian sekarang cuma garis bawah, dan
+   warnanya ikut KELOMPOK isian itu, bukan urutannya. Kelompoknya
+   ditandai kelas rt-nf--* dari rute.js, jadi menyisipkan medan baru
+   tidak menggeser warna medan lain.
+
+   Dua, susunannya jadi kisi dua kolom. Angka teknis paling panjang
+   cuma empat digit, jadi satu baris penuh untuk satu angka itu
+   pemborosan. Yang tetap selebar panel cuma isian yang teksnya bisa
+   panjang: pelabuhan, transit, jenis kapal, dan tombol.
+   =================================================================== */
+
+.rt-form {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 14px 14px; align-items: end;
+}
+/* Yang WAJIB selebar panel. Sisanya, yaitu .rt-nf, mengisi satu kolom. */
+.rt-form > .rt-field,
+.rt-form > .rt-grp-ttl,
+.rt-form > .rt-adv-btn,
+.rt-form > .rt-adv,
+.rt-form > .rt-go,
+.rt-form > .rt-note { grid-column: 1 / -1; }
+
+.rt-adv { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: end; padding-top: 2px; }
+.rt-adv > .rt-grp-ttl { grid-column: 1 / -1; }
+
+/* ---- Medan angka: label di atas, angka di bawah, bergaris ---- */
+.rt-nf { display: flex; flex-direction: column; align-items: stretch; gap: 5px; min-width: 0; }
+.rt-nf-lbl { flex: none; font-size: 11px; line-height: 1.3; color: var(--ink-50); }
+.rt-nf-in {
+  display: flex; align-items: baseline; gap: 6px;
+  background: transparent; border: 0; border-radius: 0;
+  border-bottom: 1.5px solid var(--garis, var(--ink-20));
+  padding: 0 0 4px; box-shadow: none;
+}
+.rt-nf-in:focus-within { border-bottom-width: 2px; box-shadow: none; }
+.rt-nf-in input {
+  flex: 1; min-width: 0; width: 100%;
+  background: transparent; border: 0; padding: 0;
+  font-size: 15px; font-weight: 500; color: var(--ink);
+}
+.rt-nf-in i {
+  flex: none; background: transparent; border: 0; padding: 0;
+  font-size: 10px; font-style: normal; color: var(--ink-50);
+}
+
+/* Warna per kelompok. Beda jelas satu sama lain, dan semuanya masih
+   terbaca sebagai garis di atas kertas putih. */
+.rt-nf--kapal { --garis: #0E9594; }
+.rt-nf--mesin { --garis: #6B4EA0; }
+.rt-nf--aman  { --garis: #D4781F; }
+.rt-nf--harga { --garis: #2E7D32; }
+
+/* ---- Pelabuhan dan pilihan: ikut kehilangan kotaknya ---- */
+.rt-combo {
+  background: transparent; border: 0; border-radius: 0;
+  border-bottom: 1.5px solid var(--aksen); padding: 0 0 4px; box-shadow: none;
+}
+.rt-combo:focus-within { border-bottom-width: 2px; box-shadow: none; }
+.rt-combo-ic { padding: 0 8px 0 0; color: var(--aksen); }
+.rt-combo-input { font-size: 14px; }
+.rt-field .select-wrap, .rt-od, .rt-nf-in, .rt-combo { min-width: 0; }
+.rt-field .select-wrap select {
+  background: transparent; border: 0; border-radius: 0;
+  border-bottom: 1.5px solid #6B4EA0; padding: 0 22px 4px 0; box-shadow: none;
+  font-size: 14px; color: var(--ink);
+}
+.rt-add-transit {
+  background: transparent; border: 0; border-bottom: 1.5px dashed var(--ink-20);
+  border-radius: 0; padding: 0 0 5px; color: var(--aksen); box-shadow: none;
+}
+.rt-add-transit:hover { border-bottom-color: var(--aksen); background: transparent; }
+
+/* Judul kelompok jadi penanda bagian, bukan sekadar teks nyelip. */
+.rt-grp-ttl {
+  margin-top: 6px; padding-top: 12px;
+  border-top: var(--bw) solid var(--ink-20);
+  font-size: 10px; font-weight: 400; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--ink-50);
+}
+.rt-field > .label-caps { font-size: 10px; letter-spacing: .14em; color: var(--ink-50); }
+
+/* ===================================================================
+   PETUNJUK AWAL di panel bawah, selama belum ada jalur yang dihitung.
+   Dia menempati ruang yang nanti dipakai garis waktu pelayaran, supaya
+   ruang itu terbaca sebagai "belum diisi", bukan sebagai kosong rusak.
+   =================================================================== */
+.rt-mulai {
+  display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr);
+  gap: 28px; align-items: start; padding: 4px 0 0;
+}
+.rt-mulai-tag {
+  display: inline-block; font-size: 9px; font-weight: 400;
+  letter-spacing: .16em; text-transform: uppercase; color: var(--ink-50);
+}
+.rt-mulai-judul {
+  margin: 6px 0 8px; font-family: var(--font-display);
+  font-size: 19px; font-weight: 600; color: var(--ink);
+}
+.rt-mulai-teks { margin: 0; font-size: 12px; line-height: 1.6; color: var(--ink-50); }
+
+.rt-langkah {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px;
+}
+.rt-langkah li { display: flex; align-items: flex-start; gap: 10px; min-width: 0; }
+.rt-no {
+  flex: none; width: 22px; height: 22px; border-radius: 999px;
+  display: grid; place-items: center;
+  border: var(--bw) solid var(--ink-20); background: transparent;
+  font-size: 11px; font-weight: 500; color: var(--aksen);
+}
+.rt-langkah strong {
+  display: block; margin-bottom: 3px;
+  font-size: 12.5px; font-weight: 600; color: var(--ink);
+}
+.rt-langkah div { font-size: 11px; line-height: 1.55; color: var(--ink-50); }
+
+@media (max-width: 1100px) {
+  /* Panel menyempit, tiga langkah berdampingan jadi terlalu kurus. */
+  .rt-mulai { grid-template-columns: 1fr; gap: 14px; }
+  .rt-mulai-teks { display: none; }
+  .rt-langkah { gap: 12px; }
+}
+
+/* ===================================================================
+   SIDEBAR PERMANEN, PANEL BAWAH BISA DISEMBUNYIKAN
+   5 November 2026, diminta pemilik.
+   =================================================================== */
+
+/* Sidebar tidak pernah bergeser keluar lagi. Kelas .show dipertahankan
+   supaya kode yang membacanya tidak perlu diubah, tapi geserannya nol. */
+#rute-panel, #rute-panel.show { transform: none; }
+.rt-head { padding-top: 12px; }
+.rt-scroll { overflow-y: auto; }
+
+/* ---- Tombol penyembunyi panel bawah ----
+   Menempel di tepi ATAS panel, pojok kanan, menonjol ke luar seperti
+   lidah. Waktu panelnya turun dia ikut turun dan tetap terlihat, jadi
+   ada yang bisa diketuk untuk memunculkannya lagi. */
+.rt-bawah-x {
+  position: absolute; top: -22px; right: 20px;
+  width: 46px; height: 22px; padding: 0; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--paper); color: var(--aksen);
+  border: var(--bw) solid var(--ink-20); border-bottom: 0;
+  border-radius: 3px 3px 0 0; box-shadow: none; z-index: 2;
+}
+.rt-bawah-x:hover { background: var(--surface-high); color: var(--ink); }
+.rt-bawah-x .material-symbols-outlined { font-size: 18px; line-height: 1; transition: transform .28s ease; }
+
+/* Menyembunyikan = MENGGESER turun, bukan display none. Tombolnya ikut
+   turun bersama panel dan berhenti tepat di tepi layar, jadi tetap bisa
+   diketuk. Kalau pakai display none, tombolnya ikut hilang. */
+#stage.bawah-tutup #rt-bawah { transform: translateY(100%); }
+#stage.bawah-tutup .rt-bawah-x .material-symbols-outlined { transform: rotate(180deg); }
+#stage.bawah-tutup .ui-bottom { margin-bottom: 0; }
+#stage.bawah-tutup .scrim--bawah { bottom: 0; }
+
+/* Panel bawah tertutup, tombolnya tetap kelihatan dengan naik setinggi
+   dirinya sendiri terhadap panel yang sudah turun. */
+#stage.bawah-tutup .rt-bawah-x { top: calc(-22px - var(--rt-tl-h)); }
+
+#rt-bawah #rt-timeline { overflow-x: auto; overflow-y: hidden; }
+
+/* ---- Tombol penyembunyi: biru tembus pandang, mentok bawah ----
+   5 November 2026, diminta pemilik. */
+.rt-bawah-x {
+  background: rgba(22, 121, 171, .75); color: #fff; border: 0;
+  -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+}
+.rt-bawah-x:hover { background: rgba(22, 121, 171, .95); color: #fff; }
+
+/* Tinggi chrome bawah, yaitu jarak dari tepi layar ke puncak bilah slider
+   dan legenda. TERUKUR 131 px, bukan ditebak. Dipakai menambatkan tombol
+   waktu panelnya tertutup supaya dia berhenti tepat di atas legenda, bukan
+   melayang di tengah peta seperti sebelumnya. */
+:root { --ui-bawah-h: 131px; }
+#stage.bawah-tutup .rt-bawah-x { top: calc(-22px - var(--ui-bawah-h) - 6px); }
+
+/* Kekhususan dinaikkan dengan menyebut DUA kelas di #stage. Aturan
+   #stage.rute-on #rt-bawah dan #stage.bawah-tutup #rt-bawah kekhususannya
+   sama persis, dan yang menang jadi bergantung urutan berkas, sesuatu yang
+   gampang berubah tanpa disadari waktu blok baru ditempel. Dengan dua kelas
+   sekaligus, yang ini selalu menang. */
+#stage.rute-on.bawah-tutup #rt-bawah { transform: translateY(100%); }
+
+/* ===================================================================
+   TOMBOL PANEL BAWAH PINDAH KE TEPI KIRI SIDEBAR, 5 November 2026.
+   Bentuknya diputar 90 derajat: dulu melebar 46x22 menempel di tepi
+   atas panel bawah, sekarang menjulang 22x48 menempel di tepi kiri
+   sidebar. Sidebar permanen, jadi tombolnya diam di tempat baik panel
+   bawah sedang terbuka maupun tertutup.
+   =================================================================== */
+#rute-panel { overflow: visible; }
+.rt-bawah-x {
+  position: absolute; left: -22px; bottom: 26px; top: auto; right: auto;
+  width: 22px; height: 48px; padding: 0; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(22, 121, 171, .75); color: #fff; border: 0;
+  border-radius: 3px 0 0 3px; box-shadow: none; z-index: 3;
+  -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+}
+.rt-bawah-x:hover { background: rgba(22, 121, 171, .95); }
+.rt-bawah-x .material-symbols-outlined {
+  font-size: 18px; line-height: 1;
+  transform: rotate(90deg); transition: transform .28s ease;
+}
+/* Tertutup, panahnya berbalik. */
+#stage.bawah-tutup .rt-bawah-x .material-symbols-outlined { transform: rotate(270deg); }
+/* Aturan lama yang menambatkannya ke panel bawah dimatikan. */
+#stage.bawah-tutup .rt-bawah-x { top: auto; }

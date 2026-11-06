@@ -620,6 +620,29 @@
         '<div class="rt-tl-axis">' + ticks + '</div></div></div>';
   }
 
+  /* Sudah cukup untuk dihitung? Dipakai supaya database pelabuhan yang baru
+     selesai diunduh tidak memicu hitungan di form yang masih kosong. */
+  function siapHitung() {
+    return !!(portByIdN(comboPort(asalCombo())) && portByIdN(comboPort(tujuanCombo())));
+  }
+
+  /* Petunjuk di panel bawah selama belum ada yang dihitung. Dia menempati
+     ruang yang nanti dipakai garis waktu pelayaran, jadi orang tahu ruang itu
+     untuk apa, bukan sekadar kosong. */
+  function petunjukAwal() {
+    return '<div class="rt-mulai">' +
+      '<div class="rt-mulai-kiri">' +
+        '<span class="rt-mulai-tag">Belum ada jalur</span>' +
+        '<h3 class="rt-mulai-judul">Rencanakan pelayaranmu</h3>' +
+        '<p class="rt-mulai-teks">Di sini nanti muncul garis waktu pelayaranmu, mulai jam berangkat sampai jam tiba, cuaca yang dilewati di tiap penggal jalur, dan perkiraan biayanya.</p>' +
+      '</div>' +
+      '<ol class="rt-langkah">' +
+        '<li><span class="rt-no">1</span><div><strong>Pilih asal dan tujuan</strong>Ketik nama pelabuhan di panel kanan, lalu pilih dari daftar yang muncul.</div></li>' +
+        '<li><span class="rt-no">2</span><div><strong>Pilih jenis kapal</strong>Angka teknisnya terisi sendiri, dan semuanya boleh kamu ubah.</div></li>' +
+        '<li><span class="rt-no">3</span><div><strong>Tekan Hitung rute</strong>Jalurnya dirangkai dari jaringan laut yang betul betul dilayari.</div></li>' +
+      '</ol></div>';
+  }
+
   function tlMsg(html) {   // pesan/peringatan tampil di area timeline (kelihatan), kosongkan modal kartu
     var el = document.getElementById("rt-timeline"); if (el) el.innerHTML = html;
     var c = document.getElementById("rt-cards"); if (c) c.innerHTML = "";
@@ -644,7 +667,7 @@
     document.getElementById("rt-eta-val").textContent = num("rt-eta").toFixed(2);
     var aPort = portByIdN(comboPort(asalCombo())), bPort = portByIdN(comboPort(tujuanCombo()));
     if (!aPort || !bPort) {
-      tlMsg('<div class="rute-tertahan"><span class="material-symbols-outlined">info</span><div><strong>Lengkapi pelabuhan</strong>Ketik dan pilih pelabuhan asal dan tujuan dulu.</div></div>');
+      tlMsg(petunjukAwal());
       bersihPeta(); return;
     }
     var transits = readTransits();
@@ -703,9 +726,12 @@
     document.getElementById("param-body").textContent = d.body;
     ov.classList.add("show"); ov.setAttribute("aria-hidden", "false");
   }
-  function nf(id, label, unit, step) {
+  /* grup cuma menentukan WARNA garis bawahnya, tidak mengubah apa apa yang
+     dihitung. Dipasang di sini supaya CSS tidak perlu menebak lewat nth-child
+     yang langsung rusak begitu ada medan baru disisipkan. */
+  function nf(id, label, unit, step, grup) {
     var info = NF_INFO[id] ? '<span class="rt-nf-info" data-info="' + id + '" role="button" tabindex="0" aria-label="Apa itu ' + label + '">!</span>' : '';
-    return '<label class="rt-nf"><span class="rt-nf-lbl">' + label + info + '</span>' +
+    return '<label class="rt-nf' + (grup ? ' rt-nf--' + grup : '') + '"><span class="rt-nf-lbl">' + label + info + '</span>' +
            '<span class="rt-nf-in"><input type="number" id="' + id + '" step="' + step + '" /><i>' + unit + '</i></span></label>';
   }
   /* ---- jaringan laut real -> pathfinding Dijkstra (asal bebas, tujuan bebas) ---- */
@@ -874,10 +900,19 @@
   function buildPanel() {
     var aside = document.createElement("aside");
     aside.id = "rute-panel"; aside.className = "panel";
-    var jenisOpts = JENIS.map(function (j) { return '<option value="' + j.id + '">' + j.nama + '</option>'; }).join("");
+    /* Pilihan kosong di depan. Tampilan awal tidak lagi memilihkan kapal
+       untuk orang, sebab angka yang sudah terisi terbaca seperti jawaban
+       padahal cuma contoh. Begitu jenis dipilih, angkanya terisi sendiri. */
+    var jenisOpts = '<option value="" selected>Pilih jenis kapal</option>' +
+      JENIS.map(function (j) { return '<option value="' + j.id + '">' + j.nama + '</option>'; }).join("");
     aside.innerHTML =
-      '<div class="rt-head"><div><span class="label-caps">Rute Pelayaran</span><div class="rt-title">Dampak tiap jalur</div></div>' +
-        '<button id="rt-close" class="rt-x" title="Tutup"><span class="material-symbols-outlined">close</span></button></div>' +
+      /* Kepala sidebar diawali IDENTITAS, bukan judul panel. Diminta pemilik
+         5 November 2026. Lambang CESGS dan keterangan waktu data dipindahkan
+         ke sini dari atas peta, jadi sudut kiri atas peta bersih.
+         Wadahnya kosong di sini, isinya dipindahkan dari #ui sesudah panel
+         menempel, supaya tidak ada markup yang digandakan. */
+      '<div class="rt-ident" id="rt-ident"></div>' +
+      '<div class="rt-head"><div><span class="label-caps">Rute Pelayaran</span><div class="rt-title">Dampak tiap jalur</div></div></div>' +
       '<div class="rt-scroll"><div class="rt-form">' +
         '<div class="rt-field"><span class="label-caps">Asal</span>' + makeComboHtml("rt-asal-in", "ketik nama pelabuhan asal") + '</div>' +
 
@@ -891,24 +926,47 @@
         '<div class="rt-field" id="rt-nama-wrap" style="display:none"><span class="label-caps">Nama atau tipe kapal</span><div class="rt-nf-in"><input type="text" id="rt-nama" placeholder="ketik tipe kapal" /></div></div>' +
 
         '<div class="rt-grp-ttl">Dimensi dan operasi</div>' +
-        nf("rt-L","Panjang garis air","m","1") + nf("rt-B","Lebar","m","0.1") +
-        nf("rt-V0","Kecepatan dinas","knot","0.5") + nf("rt-FOC0","Konsumsi BBM","ton/hari","0.1") +
+        nf("rt-L","Panjang garis air","m","1","kapal") + nf("rt-B","Lebar","m","0.1","kapal") +
+        nf("rt-V0","Kecepatan dinas","knot","0.5","kapal") + nf("rt-FOC0","Konsumsi BBM","ton/hari","0.1","kapal") +
 
         '<button id="rt-adv" class="rt-adv-btn" type="button"><span class="material-symbols-outlined">expand_more</span> Parameter lanjutan</button>' +
         '<div id="rt-adv-box" class="rt-adv" hidden>' +
-          nf("rt-SFOC","Konsumsi spesifik mesin","g/kWh","1") + nf("rt-etaD","Efisiensi propulsi","0-1","0.01") +
-          nf("rt-AT","Luas kena angin","m2","10") + nf("rt-CX","Koefisien angin","","0.05") +
-          '<div class="rt-grp-ttl">Ambang keselamatan</div>' + nf("rt-ambHs","Batas tinggi ombak","m","0.1") + nf("rt-ambAngin","Batas angin","knot","1") +
-          '<div class="rt-grp-ttl">Harga</div>' + nf("rt-bunker","Harga bunker","USD/ton","10") + nf("rt-kurs","Kurs","Rp/USD","100") + nf("rt-sewa","Sewa harian","USD/hari","100") +
+          nf("rt-SFOC","Konsumsi spesifik mesin","g/kWh","1","mesin") + nf("rt-etaD","Efisiensi propulsi","0-1","0.01","mesin") +
+          nf("rt-AT","Luas kena angin","m2","10","mesin") + nf("rt-CX","Koefisien angin","","0.05","mesin") +
+          '<div class="rt-grp-ttl">Ambang keselamatan</div>' + nf("rt-ambHs","Batas tinggi ombak","m","0.1","aman") + nf("rt-ambAngin","Batas angin","knot","1","aman") +
+          '<div class="rt-grp-ttl">Harga</div>' + nf("rt-bunker","Harga bunker","USD/ton","10","harga") + nf("rt-kurs","Kurs","Rp/USD","100","harga") + nf("rt-sewa","Sewa harian","USD/hari","100","harga") +
         '</div>' +
 
         '<div class="rt-field"><span class="label-caps">Kompensasi laju (eta) <b id="rt-eta-val">0.50</b><span class="rt-nf-info" data-info="rt-eta" role="button" tabindex="0" aria-label="Apa itu kompensasi laju">!</span></span>' +
           '<input type="range" id="rt-eta" min="0" max="1" step="0.05" value="0.5" /><div class="rt-eta-cap"><span>santai hemat BBM</span><span>kejar jadwal</span></div></div>' +
 
         '<button id="rt-hitung" class="rt-go">Hitung rute</button>' +
-        '<div class="rt-note">Pilih asal dan tujuan bebas. Jalur dirangkai dari jaringan laut REAL (rute feri + Pelni + penyeberangan BMKG, pelabuhan World Port Index). Kalau nggak ada rute langsung, disambung lewat beberapa ruas real (kayak transit). Cuaca dari data model: ombak GFS-Wave, angin GFS, arus CMEMS, disampel sepanjang jalur. Jenis kapal cuma ngatur angka teknis, boleh diedit.</div>' +
-      '</div><div id="rt-timeline"></div></div>';
+      '</div></div>';
     document.getElementById("stage").appendChild(aside);
+
+    /* PANEL TIME SERIES JALUR berdiri SENDIRI di bawah, bukan lagi di dalam
+       sidebar. Dipisah 5 November 2026 mengikuti sketsa pemilik: form ke
+       kanan, grafik sepanjang jalur melintang penuh di bawah. Dibuat di sini
+       supaya umurnya sama dengan panelnya dan tidak perlu penjaga null. */
+    var bawah = document.createElement("div");
+    bawah.id = "rt-bawah";
+    /* Keterangan panjang soal cara jalur dirangkai DIBUANG 5 November 2026,
+       diminta pemilik. Isinya sudah terwakili petunjuk tiga langkah yang
+       muncul selama belum ada jalur. */
+    bawah.innerHTML = '<div id="rt-timeline"></div>';
+    document.getElementById("stage").appendChild(bawah);
+
+    /* Tombolnya menempel di TEPI KIRI SIDEBAR, bukan di panel bawah.
+       Diminta pemilik 5 November 2026. Ditaruh di sidebar sebab sidebar
+       itu permanen, jadi tombolnya tidak ikut bergerak waktu panel bawah
+       turun dan tidak perlu dihitung ulang letaknya. */
+    var tx = document.createElement("button");
+    tx.id = "rt-bawah-x"; tx.className = "rt-bawah-x"; tx.type = "button";
+    tx.setAttribute("aria-label", "Sembunyikan panel bawah");
+    tx.title = "Sembunyikan panel bawah";
+    tx.innerHTML = '<span class="material-symbols-outlined">keyboard_arrow_down</span>';
+    tx.addEventListener("click", toggleBawah);
+    aside.appendChild(tx);
 
     /* modal kartu taktik (tengah layar), dibuka tombol "Taktik & biaya" di timeline */
     var modal = document.createElement("div");
@@ -921,17 +979,28 @@
       if (e.target.closest(".rt-modal-x") || e.target.classList.contains("rt-modal-back")) closeCards();
     });
 
-    buildGraph(); setDefaultPair();   // asal/tujuan bebas, isi default yang nyambung
+    buildGraph();
+    /* KOSONG di awal, diminta pemilik. Dulu asal dan tujuan diisikan
+       Surabaya ke Ujung Pandang dan kapalnya dipilihkan feri, jadi peta
+       langsung menggambar jalur yang bukan punya siapa siapa. Harga bunker,
+       kurs, dan sewa TETAP diisi, itu angka pasar bukan parameter kapal. */
     setVal("rt-bunker", FMS.HARGA.bunker); setVal("rt-kurs", FMS.HARGA.kurs); setVal("rt-sewa", FMS.HARGA.sewa);
-    isiDariJenis("feri");
+    tlMsg(petunjukAwal());
 
-    aside.querySelector("#rt-jenis").addEventListener("change", function () { isiDariJenis(this.value); jalankan(); });
+    aside.querySelector("#rt-jenis").addEventListener("change", function () {
+      if (!this.value) return;   // kembali ke pilihan kosong, jangan hapus angka yang sudah diedit
+      isiDariJenis(this.value); jalankan();
+    });
     aside.querySelector("#rt-adv").addEventListener("click", function () { var box = document.getElementById("rt-adv-box"); box.hidden = !box.hidden; this.classList.toggle("open", !box.hidden); });
     aside.addEventListener("click", function (e) { var b = e.target.closest(".rt-nf-info"); if (!b) return; e.preventDefault(); e.stopPropagation(); showParam(b.dataset.info); });
     aside.addEventListener("keydown", function (e) { if ((e.key === "Enter" || e.key === " ") && e.target.classList.contains("rt-nf-info")) { e.preventDefault(); showParam(e.target.dataset.info); } });
     aside.querySelector("#rt-hitung").addEventListener("click", jalankan);
     aside.querySelector("#rt-eta").addEventListener("input", function () { document.getElementById("rt-eta-val").textContent = parseFloat(this.value).toFixed(2); });
-    aside.querySelector("#rt-close").addEventListener("click", tutup);
+    /* Identitas DIPINDAHKAN, bukan disalin. appendChild memindahkan simpul
+       yang sudah ada beserta pendengarnya, jadi tombol Tentang tetap jalan. */
+    var ident = aside.querySelector("#rt-ident");
+    var brand = document.querySelector(".brand-row");
+    if (brand) ident.appendChild(brand);
 
     /* ---- combobox pelabuhan + transit (delegasi, berlaku juga buat baris transit baru) ---- */
     aside.addEventListener("input", function (e) {
@@ -974,23 +1043,46 @@
 
   var panel = null, aktif = false;
   /* tinggi panel bawah yg nutup peta (0 kalau tutup) -> buat reframe + padding fitBounds */
-  function panelCoverPx() { return (panel && panel.classList.contains("show")) ? Math.round(panel.getBoundingClientRect().height) : 0; }
-  function setInset(px) { if (window.BARUNA_setInset) window.BARUNA_setInset(px); }
+  /* Sidebar memakan LEBAR, panel time series memakan TINGGI. Dulu dua duanya
+     satu lembar di bawah jadi cukup satu angka. */
+  function terbuka() { return !!(panel && panel.classList.contains("show")); }
+  function panelCoverPx() {
+    var st = document.getElementById("stage");
+    if (st.classList.contains("bawah-tutup")) return 0;
+    var tl = document.getElementById("rt-bawah");
+    return (terbuka() && tl && tl.offsetParent !== null) ? Math.round(tl.getBoundingClientRect().height) : 0;
+  }
+  function sidebarPx() { return terbuka() ? Math.round(panel.getBoundingClientRect().width) : 0; }
+  function setInset(px) {
+    if (window.BARUNA_setInset) window.BARUNA_setInset(px);
+    if (window.BARUNA_setInsetX) window.BARUNA_setInsetX(sidebarPx());
+  }
   function buka() {
     if (!panel) panel = buildPanel();
-    panel.classList.add("show"); document.getElementById("rute-btn").classList.add("active"); aktif = true;
+    panel.classList.add("show"); aktif = true;
+    /* Penanda di #stage, bukan cuma di panelnya. #rt-timeline sekarang
+       saudara panel, bukan anaknya, jadi dia perlu saklar yang sama. Chrome
+       peta (legenda, bilah waktu, tombol zoom) juga menggeser lewat kelas
+       ini supaya tidak tertimpa sidebar. */
+    document.getElementById("stage").classList.add("rute-on");
     setInset(panelCoverPx());
     if (window.BARUNA_reframe) window.BARUNA_reframe();   // kalau nanti ga ada rute, view domain ikut naik ke atas panel
     jalankan();                                          // ada rute -> gambarPeta fit rute dgn padding bawah (view final)
     setInset(panelCoverPx());                            // inset final stlh timeline (tanpa reframe, biar fit rute kejaga)
   }
+  /* SIDEBAR PERMANEN sejak 5 November 2026. Yang bisa disembunyikan cuma
+     panel bawah, lewat tombol di pojok kanan atasnya. tutup() sekarang
+     menyembunyikan panel bawah saja dan membiarkan sidebar berdiri. */
   function tutup() {
-    if (panel) panel.classList.remove("show");
-    var b = document.getElementById("rute-btn"); if (b) b.classList.remove("active");
-    aktif = false; bersihPeta(); closeCards();
-    setInset(0); if (window.BARUNA_reframe) window.BARUNA_reframe();
+    document.getElementById("stage").classList.add("bawah-tutup");
+    setInset(panelCoverPx()); if (window.BARUNA_reframe) window.BARUNA_reframe();
   }
-  function toggle() { aktif ? tutup() : buka(); }
+  function toggleBawah() {
+    var st = document.getElementById("stage");
+    st.classList.toggle("bawah-tutup");
+    setInset(panelCoverPx());
+    if (window.BARUNA_reframe) window.BARUNA_reframe();
+  }
   window.addEventListener("resize", function () {
     if (!aktif) return;
     setInset(panelCoverPx()); if (window.BARUNA_reframe) window.BARUNA_reframe();
@@ -1001,11 +1093,12 @@
     if (!map || typeof FMS === "undefined") { console.warn("rute.js: map atau FMS belum siap"); return; }
     /* muat database jalur laut; kalau gagal, fallback garis lurus */
     fetch("data/rute/real_routes.json", { cache: "no-store" }).then(function (r) { return r.json(); })
-      .then(function (d) { RUTEDB = d; if (d.ports && d.ports.length) PORTS = d.ports; buildGraph(); if (panel) setDefaultPair(); if (aktif) jalankan(); })
+      .then(function (d) { RUTEDB = d; if (d.ports && d.ports.length) PORTS = d.ports; buildGraph(); if (aktif && siapHitung()) jalankan(); })
       .catch(function () { console.warn("rute.js: real_routes.json tidak ada, pakai garis lurus"); });
-    var btn = document.getElementById("rute-btn");
-    if (btn) btn.addEventListener("click", toggle);
-    if ((location.hash || "").indexOf("rute") >= 0) setTimeout(buka, 400);
+    /* TERBUKA SEJAK AWAL, diminta pemilik lewat sketsa 5 November 2026. Dulu
+       panelnya tersembunyi sampai tombol kapal diketuk, dan fitur utama
+       aplikasi ini jadi tidak pernah terlihat orang yang baru membuka. */
+    setTimeout(buka, 400);
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
   else init();

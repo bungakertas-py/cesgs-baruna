@@ -1,1 +1,667 @@
-{"generated": "2026-10-26T09:20:42Z", "run": "2026-10-25T18:00:00Z", "now": "2026-10-25T18:00:00Z", "cape": {"label": "Potensi badai (CAPE)", "units": "J/kg", "source": "GFS (NOAA)", "frames": [{"valid_time": "2026-10-25T18:00:00Z", "grid": "cape_f000.json"}, {"valid_time": "2026-10-25T21:00:00Z", "grid": "cape_f003.json"}, {"valid_time": "2026-10-26T00:00:00Z", "grid": "cape_f006.json"}, {"valid_time": "2026-10-26T03:00:00Z", "grid": "cape_f009.json"}, {"valid_time": "2026-10-26T06:00:00Z", "grid": "cape_f012.json"}, {"valid_time": "2026-10-26T09:00:00Z", "grid": "cape_f015.json"}, {"valid_time": "2026-10-26T12:00:00Z", "grid": "cape_f018.json"}, {"valid_time": "2026-10-26T15:00:00Z", "grid": "cape_f021.json"}, {"valid_time": "2026-10-26T18:00:00Z", "grid": "cape_f024.json"}, {"valid_time": "2026-10-26T21:00:00Z", "grid": "cape_f027.json"}, {"valid_time": "2026-10-27T00:00:00Z", "grid": "cape_f030.json"}, {"valid_time": "2026-10-27T03:00:00Z", "grid": "cape_f033.json"}, {"valid_time": "2026-10-27T06:00:00Z", "grid": "cape_f036.json"}, {"valid_time": "2026-10-27T09:00:00Z", "grid": "cape_f039.json"}, {"valid_time": "2026-10-27T12:00:00Z", "grid": "cape_f042.json"}, {"valid_time": "2026-10-27T15:00:00Z", "grid": "cape_f045.json"}, {"valid_time": "2026-10-27T18:00:00Z", "grid": "cape_f048.json"}, {"valid_time": "2026-10-27T21:00:00Z", "grid": "cape_f051.json"}, {"valid_time": "2026-10-28T00:00:00Z", "grid": "cape_f054.json"}, {"valid_time": "2026-10-28T03:00:00Z", "grid": "cape_f057.json"}, {"valid_time": "2026-10-28T06:00:00Z", "grid": "cape_f060.json"}, {"valid_time": "2026-10-28T09:00:00Z", "grid": "cape_f063.json"}, {"valid_time": "2026-10-28T12:00:00Z", "grid": "cape_f066.json"}, {"valid_time": "2026-10-28T15:00:00Z", "grid": "cape_f069.json"}, {"valid_time": "2026-10-28T18:00:00Z", "grid": "cape_f072.json"}, {"valid_time": "2026-10-28T21:00:00Z", "grid": "cape_f075.json"}, {"valid_time": "2026-10-29T00:00:00Z", "grid": "cape_f078.json"}, {"valid_time": "2026-10-29T03:00:00Z", "grid": "cape_f081.json"}, {"valid_time": "2026-10-29T06:00:00Z", "grid": "cape_f084.json"}, {"valid_time": "2026-10-29T09:00:00Z", "grid": "cape_f087.json"}, {"valid_time": "2026-10-29T12:00:00Z", "grid": "cape_f090.json"}, {"valid_time": "2026-10-29T15:00:00Z", "grid": "cape_f093.json"}, {"valid_time": "2026-10-29T18:00:00Z", "grid": "cape_f096.json"}, {"valid_time": "2026-10-29T21:00:00Z", "grid": "cape_f099.json"}, {"valid_time": "2026-10-30T00:00:00Z", "grid": "cape_f102.json"}, {"valid_time": "2026-10-30T03:00:00Z", "grid": "cape_f105.json"}, {"valid_time": "2026-10-30T06:00:00Z", "grid": "cape_f108.json"}, {"valid_time": "2026-10-30T09:00:00Z", "grid": "cape_f111.json"}, {"valid_time": "2026-10-30T12:00:00Z", "grid": "cape_f114.json"}, {"valid_time": "2026-10-30T15:00:00Z", "grid": "cape_f117.json"}, {"valid_time": "2026-10-30T18:00:00Z", "grid": "cape_f120.json"}, {"valid_time": "2026-10-30T21:00:00Z", "grid": "cape_f123.json"}, {"valid_time": "2026-10-31T00:00:00Z", "grid": "cape_f126.json"}, {"valid_time": "2026-10-31T03:00:00Z", "grid": "cape_f129.json"}, {"valid_time": "2026-10-31T06:00:00Z", "grid": "cape_f132.json"}, {"valid_time": "2026-10-31T09:00:00Z", "grid": "cape_f135.json"}, {"valid_time": "2026-10-31T12:00:00Z", "grid": "cape_f138.json"}, {"valid_time": "2026-10-31T15:00:00Z", "grid": "cape_f141.json"}, {"valid_time": "2026-10-31T18:00:00Z", "grid": "cape_f144.json"}, {"valid_time": "2026-10-31T21:00:00Z", "grid": "cape_f147.json"}, {"valid_time": "2026-11-01T00:00:00Z", "grid": "cape_f150.json"}, {"valid_time": "2026-11-01T03:00:00Z", "grid": "cape_f153.json"}, {"valid_time": "2026-11-01T06:00:00Z", "grid": "cape_f156.json"}, {"valid_time": "2026-11-01T09:00:00Z", "grid": "cape_f159.json"}, {"valid_time": "2026-11-01T12:00:00Z", "grid": "cape_f162.json"}, {"valid_time": "2026-11-01T15:00:00Z", "grid": "cape_f165.json"}, {"valid_time": "2026-11-01T18:00:00Z", "grid": "cape_f168.json"}, {"valid_time": "2026-11-01T21:00:00Z", "grid": "cape_f171.json"}, {"valid_time": "2026-11-02T00:00:00Z", "grid": "cape_f174.json"}, {"valid_time": "2026-11-02T03:00:00Z", "grid": "cape_f177.json"}, {"valid_time": "2026-11-02T06:00:00Z", "grid": "cape_f180.json"}, {"valid_time": "2026-11-02T09:00:00Z", "grid": "cape_f183.json"}, {"valid_time": "2026-11-02T12:00:00Z", "grid": "cape_f186.json"}, {"valid_time": "2026-11-02T15:00:00Z", "grid": "cape_f189.json"}, {"valid_time": "2026-11-02T18:00:00Z", "grid": "cape_f192.json"}, {"valid_time": "2026-11-02T21:00:00Z", "grid": "cape_f195.json"}, {"valid_time": "2026-11-03T00:00:00Z", "grid": "cape_f198.json"}, {"valid_time": "2026-11-03T03:00:00Z", "grid": "cape_f201.json"}, {"valid_time": "2026-11-03T06:00:00Z", "grid": "cape_f204.json"}, {"valid_time": "2026-11-03T09:00:00Z", "grid": "cape_f207.json"}, {"valid_time": "2026-11-03T12:00:00Z", "grid": "cape_f210.json"}, {"valid_time": "2026-11-03T15:00:00Z", "grid": "cape_f213.json"}, {"valid_time": "2026-11-03T18:00:00Z", "grid": "cape_f216.json"}, {"valid_time": "2026-11-03T21:00:00Z", "grid": "cape_f219.json"}, {"valid_time": "2026-11-04T00:00:00Z", "grid": "cape_f222.json"}, {"valid_time": "2026-11-04T03:00:00Z", "grid": "cape_f225.json"}, {"valid_time": "2026-11-04T06:00:00Z", "grid": "cape_f228.json"}, {"valid_time": "2026-11-04T09:00:00Z", "grid": "cape_f231.json"}, {"valid_time": "2026-11-04T12:00:00Z", "grid": "cape_f234.json"}, {"valid_time": "2026-11-04T15:00:00Z", "grid": "cape_f237.json"}, {"valid_time": "2026-11-04T18:00:00Z", "grid": "cape_f240.json"}]}, "rain": {"label": "Hujan", "units": "mm/jam", "source": "GFS (NOAA)", "frames": [{"valid_time": "2026-10-25T18:00:00Z", "grid": "rain_f000.json"}, {"valid_time": "2026-10-25T21:00:00Z", "grid": "rain_f003.json"}, {"valid_time": "2026-10-26T00:00:00Z", "grid": "rain_f006.json"}, {"valid_time": "2026-10-26T03:00:00Z", "grid": "rain_f009.json"}, {"valid_time": "2026-10-26T06:00:00Z", "grid": "rain_f012.json"}, {"valid_time": "2026-10-26T09:00:00Z", "grid": "rain_f015.json"}, {"valid_time": "2026-10-26T12:00:00Z", "grid": "rain_f018.json"}, {"valid_time": "2026-10-26T15:00:00Z", "grid": "rain_f021.json"}, {"valid_time": "2026-10-26T18:00:00Z", "grid": "rain_f024.json"}, {"valid_time": "2026-10-26T21:00:00Z", "grid": "rain_f027.json"}, {"valid_time": "2026-10-27T00:00:00Z", "grid": "rain_f030.json"}, {"valid_time": "2026-10-27T03:00:00Z", "grid": "rain_f033.json"}, {"valid_time": "2026-10-27T06:00:00Z", "grid": "rain_f036.json"}, {"valid_time": "2026-10-27T09:00:00Z", "grid": "rain_f039.json"}, {"valid_time": "2026-10-27T12:00:00Z", "grid": "rain_f042.json"}, {"valid_time": "2026-10-27T15:00:00Z", "grid": "rain_f045.json"}, {"valid_time": "2026-10-27T18:00:00Z", "grid": "rain_f048.json"}, {"valid_time": "2026-10-27T21:00:00Z", "grid": "rain_f051.json"}, {"valid_time": "2026-10-28T00:00:00Z", "grid": "rain_f054.json"}, {"valid_time": "2026-10-28T03:00:00Z", "grid": "rain_f057.json"}, {"valid_time": "2026-10-28T06:00:00Z", "grid": "rain_f060.json"}, {"valid_time": "2026-10-28T09:00:00Z", "grid": "rain_f063.json"}, {"valid_time": "2026-10-28T12:00:00Z", "grid": "rain_f066.json"}, {"valid_time": "2026-10-28T15:00:00Z", "grid": "rain_f069.json"}, {"valid_time": "2026-10-28T18:00:00Z", "grid": "rain_f072.json"}, {"valid_time": "2026-10-28T21:00:00Z", "grid": "rain_f075.json"}, {"valid_time": "2026-10-29T00:00:00Z", "grid": "rain_f078.json"}, {"valid_time": "2026-10-29T03:00:00Z", "grid": "rain_f081.json"}, {"valid_time": "2026-10-29T06:00:00Z", "grid": "rain_f084.json"}, {"valid_time": "2026-10-29T09:00:00Z", "grid": "rain_f087.json"}, {"valid_time": "2026-10-29T12:00:00Z", "grid": "rain_f090.json"}, {"valid_time": "2026-10-29T15:00:00Z", "grid": "rain_f093.json"}, {"valid_time": "2026-10-29T18:00:00Z", "grid": "rain_f096.json"}, {"valid_time": "2026-10-29T21:00:00Z", "grid": "rain_f099.json"}, {"valid_time": "2026-10-30T00:00:00Z", "grid": "rain_f102.json"}, {"valid_time": "2026-10-30T03:00:00Z", "grid": "rain_f105.json"}, {"valid_time": "2026-10-30T06:00:00Z", "grid": "rain_f108.json"}, {"valid_time": "2026-10-30T09:00:00Z", "grid": "rain_f111.json"}, {"valid_time": "2026-10-30T12:00:00Z", "grid": "rain_f114.json"}, {"valid_time": "2026-10-30T15:00:00Z", "grid": "rain_f117.json"}, {"valid_time": "2026-10-30T18:00:00Z", "grid": "rain_f120.json"}, {"valid_time": "2026-10-30T21:00:00Z", "grid": "rain_f123.json"}, {"valid_time": "2026-10-31T00:00:00Z", "grid": "rain_f126.json"}, {"valid_time": "2026-10-31T03:00:00Z", "grid": "rain_f129.json"}, {"valid_time": "2026-10-31T06:00:00Z", "grid": "rain_f132.json"}, {"valid_time": "2026-10-31T09:00:00Z", "grid": "rain_f135.json"}, {"valid_time": "2026-10-31T12:00:00Z", "grid": "rain_f138.json"}, {"valid_time": "2026-10-31T15:00:00Z", "grid": "rain_f141.json"}, {"valid_time": "2026-10-31T18:00:00Z", "grid": "rain_f144.json"}, {"valid_time": "2026-10-31T21:00:00Z", "grid": "rain_f147.json"}, {"valid_time": "2026-11-01T00:00:00Z", "grid": "rain_f150.json"}, {"valid_time": "2026-11-01T03:00:00Z", "grid": "rain_f153.json"}, {"valid_time": "2026-11-01T06:00:00Z", "grid": "rain_f156.json"}, {"valid_time": "2026-11-01T09:00:00Z", "grid": "rain_f159.json"}, {"valid_time": "2026-11-01T12:00:00Z", "grid": "rain_f162.json"}, {"valid_time": "2026-11-01T15:00:00Z", "grid": "rain_f165.json"}, {"valid_time": "2026-11-01T18:00:00Z", "grid": "rain_f168.json"}, {"valid_time": "2026-11-01T21:00:00Z", "grid": "rain_f171.json"}, {"valid_time": "2026-11-02T00:00:00Z", "grid": "rain_f174.json"}, {"valid_time": "2026-11-02T03:00:00Z", "grid": "rain_f177.json"}, {"valid_time": "2026-11-02T06:00:00Z", "grid": "rain_f180.json"}, {"valid_time": "2026-11-02T09:00:00Z", "grid": "rain_f183.json"}, {"valid_time": "2026-11-02T12:00:00Z", "grid": "rain_f186.json"}, {"valid_time": "2026-11-02T15:00:00Z", "grid": "rain_f189.json"}, {"valid_time": "2026-11-02T18:00:00Z", "grid": "rain_f192.json"}, {"valid_time": "2026-11-02T21:00:00Z", "grid": "rain_f195.json"}, {"valid_time": "2026-11-03T00:00:00Z", "grid": "rain_f198.json"}, {"valid_time": "2026-11-03T03:00:00Z", "grid": "rain_f201.json"}, {"valid_time": "2026-11-03T06:00:00Z", "grid": "rain_f204.json"}, {"valid_time": "2026-11-03T09:00:00Z", "grid": "rain_f207.json"}, {"valid_time": "2026-11-03T12:00:00Z", "grid": "rain_f210.json"}, {"valid_time": "2026-11-03T15:00:00Z", "grid": "rain_f213.json"}, {"valid_time": "2026-11-03T18:00:00Z", "grid": "rain_f216.json"}, {"valid_time": "2026-11-03T21:00:00Z", "grid": "rain_f219.json"}, {"valid_time": "2026-11-04T00:00:00Z", "grid": "rain_f222.json"}, {"valid_time": "2026-11-04T03:00:00Z", "grid": "rain_f225.json"}, {"valid_time": "2026-11-04T06:00:00Z", "grid": "rain_f228.json"}, {"valid_time": "2026-11-04T09:00:00Z", "grid": "rain_f231.json"}, {"valid_time": "2026-11-04T12:00:00Z", "grid": "rain_f234.json"}, {"valid_time": "2026-11-04T15:00:00Z", "grid": "rain_f237.json"}, {"valid_time": "2026-11-04T18:00:00Z", "grid": "rain_f240.json"}]}}
+{
+ "generated": "2026-11-05T08:01:06Z",
+ "run": "2026-11-05T00:00:00Z",
+ "now": "2026-11-05T00:00:00Z",
+ "cape": {
+  "label": "Potensi badai",
+  "units": "J/kg",
+  "source": "GFS CAPE",
+  "frames": [
+   {
+    "valid_time": "2026-11-05T00:00:00Z",
+    "grid": "cape_f000.json"
+   },
+   {
+    "valid_time": "2026-11-05T03:00:00Z",
+    "grid": "cape_f003.json"
+   },
+   {
+    "valid_time": "2026-11-05T06:00:00Z",
+    "grid": "cape_f006.json"
+   },
+   {
+    "valid_time": "2026-11-05T09:00:00Z",
+    "grid": "cape_f009.json"
+   },
+   {
+    "valid_time": "2026-11-05T12:00:00Z",
+    "grid": "cape_f012.json"
+   },
+   {
+    "valid_time": "2026-11-05T15:00:00Z",
+    "grid": "cape_f015.json"
+   },
+   {
+    "valid_time": "2026-11-05T18:00:00Z",
+    "grid": "cape_f018.json"
+   },
+   {
+    "valid_time": "2026-11-05T21:00:00Z",
+    "grid": "cape_f021.json"
+   },
+   {
+    "valid_time": "2026-11-06T00:00:00Z",
+    "grid": "cape_f024.json"
+   },
+   {
+    "valid_time": "2026-11-06T03:00:00Z",
+    "grid": "cape_f027.json"
+   },
+   {
+    "valid_time": "2026-11-06T06:00:00Z",
+    "grid": "cape_f030.json"
+   },
+   {
+    "valid_time": "2026-11-06T09:00:00Z",
+    "grid": "cape_f033.json"
+   },
+   {
+    "valid_time": "2026-11-06T12:00:00Z",
+    "grid": "cape_f036.json"
+   },
+   {
+    "valid_time": "2026-11-06T15:00:00Z",
+    "grid": "cape_f039.json"
+   },
+   {
+    "valid_time": "2026-11-06T18:00:00Z",
+    "grid": "cape_f042.json"
+   },
+   {
+    "valid_time": "2026-11-06T21:00:00Z",
+    "grid": "cape_f045.json"
+   },
+   {
+    "valid_time": "2026-11-07T00:00:00Z",
+    "grid": "cape_f048.json"
+   },
+   {
+    "valid_time": "2026-11-07T03:00:00Z",
+    "grid": "cape_f051.json"
+   },
+   {
+    "valid_time": "2026-11-07T06:00:00Z",
+    "grid": "cape_f054.json"
+   },
+   {
+    "valid_time": "2026-11-07T09:00:00Z",
+    "grid": "cape_f057.json"
+   },
+   {
+    "valid_time": "2026-11-07T12:00:00Z",
+    "grid": "cape_f060.json"
+   },
+   {
+    "valid_time": "2026-11-07T15:00:00Z",
+    "grid": "cape_f063.json"
+   },
+   {
+    "valid_time": "2026-11-07T18:00:00Z",
+    "grid": "cape_f066.json"
+   },
+   {
+    "valid_time": "2026-11-07T21:00:00Z",
+    "grid": "cape_f069.json"
+   },
+   {
+    "valid_time": "2026-11-08T00:00:00Z",
+    "grid": "cape_f072.json"
+   },
+   {
+    "valid_time": "2026-11-08T03:00:00Z",
+    "grid": "cape_f075.json"
+   },
+   {
+    "valid_time": "2026-11-08T06:00:00Z",
+    "grid": "cape_f078.json"
+   },
+   {
+    "valid_time": "2026-11-08T09:00:00Z",
+    "grid": "cape_f081.json"
+   },
+   {
+    "valid_time": "2026-11-08T12:00:00Z",
+    "grid": "cape_f084.json"
+   },
+   {
+    "valid_time": "2026-11-08T15:00:00Z",
+    "grid": "cape_f087.json"
+   },
+   {
+    "valid_time": "2026-11-08T18:00:00Z",
+    "grid": "cape_f090.json"
+   },
+   {
+    "valid_time": "2026-11-08T21:00:00Z",
+    "grid": "cape_f093.json"
+   },
+   {
+    "valid_time": "2026-11-09T00:00:00Z",
+    "grid": "cape_f096.json"
+   },
+   {
+    "valid_time": "2026-11-09T03:00:00Z",
+    "grid": "cape_f099.json"
+   },
+   {
+    "valid_time": "2026-11-09T06:00:00Z",
+    "grid": "cape_f102.json"
+   },
+   {
+    "valid_time": "2026-11-09T09:00:00Z",
+    "grid": "cape_f105.json"
+   },
+   {
+    "valid_time": "2026-11-09T12:00:00Z",
+    "grid": "cape_f108.json"
+   },
+   {
+    "valid_time": "2026-11-09T15:00:00Z",
+    "grid": "cape_f111.json"
+   },
+   {
+    "valid_time": "2026-11-09T18:00:00Z",
+    "grid": "cape_f114.json"
+   },
+   {
+    "valid_time": "2026-11-09T21:00:00Z",
+    "grid": "cape_f117.json"
+   },
+   {
+    "valid_time": "2026-11-10T00:00:00Z",
+    "grid": "cape_f120.json"
+   },
+   {
+    "valid_time": "2026-11-10T03:00:00Z",
+    "grid": "cape_f123.json"
+   },
+   {
+    "valid_time": "2026-11-10T06:00:00Z",
+    "grid": "cape_f126.json"
+   },
+   {
+    "valid_time": "2026-11-10T09:00:00Z",
+    "grid": "cape_f129.json"
+   },
+   {
+    "valid_time": "2026-11-10T12:00:00Z",
+    "grid": "cape_f132.json"
+   },
+   {
+    "valid_time": "2026-11-10T15:00:00Z",
+    "grid": "cape_f135.json"
+   },
+   {
+    "valid_time": "2026-11-10T18:00:00Z",
+    "grid": "cape_f138.json"
+   },
+   {
+    "valid_time": "2026-11-10T21:00:00Z",
+    "grid": "cape_f141.json"
+   },
+   {
+    "valid_time": "2026-11-11T00:00:00Z",
+    "grid": "cape_f144.json"
+   },
+   {
+    "valid_time": "2026-11-11T03:00:00Z",
+    "grid": "cape_f147.json"
+   },
+   {
+    "valid_time": "2026-11-11T06:00:00Z",
+    "grid": "cape_f150.json"
+   },
+   {
+    "valid_time": "2026-11-11T09:00:00Z",
+    "grid": "cape_f153.json"
+   },
+   {
+    "valid_time": "2026-11-11T12:00:00Z",
+    "grid": "cape_f156.json"
+   },
+   {
+    "valid_time": "2026-11-11T15:00:00Z",
+    "grid": "cape_f159.json"
+   },
+   {
+    "valid_time": "2026-11-11T18:00:00Z",
+    "grid": "cape_f162.json"
+   },
+   {
+    "valid_time": "2026-11-11T21:00:00Z",
+    "grid": "cape_f165.json"
+   },
+   {
+    "valid_time": "2026-11-12T00:00:00Z",
+    "grid": "cape_f168.json"
+   },
+   {
+    "valid_time": "2026-11-12T03:00:00Z",
+    "grid": "cape_f171.json"
+   },
+   {
+    "valid_time": "2026-11-12T06:00:00Z",
+    "grid": "cape_f174.json"
+   },
+   {
+    "valid_time": "2026-11-12T09:00:00Z",
+    "grid": "cape_f177.json"
+   },
+   {
+    "valid_time": "2026-11-12T12:00:00Z",
+    "grid": "cape_f180.json"
+   },
+   {
+    "valid_time": "2026-11-12T15:00:00Z",
+    "grid": "cape_f183.json"
+   },
+   {
+    "valid_time": "2026-11-12T18:00:00Z",
+    "grid": "cape_f186.json"
+   },
+   {
+    "valid_time": "2026-11-12T21:00:00Z",
+    "grid": "cape_f189.json"
+   },
+   {
+    "valid_time": "2026-11-13T00:00:00Z",
+    "grid": "cape_f192.json"
+   },
+   {
+    "valid_time": "2026-11-13T03:00:00Z",
+    "grid": "cape_f195.json"
+   },
+   {
+    "valid_time": "2026-11-13T06:00:00Z",
+    "grid": "cape_f198.json"
+   },
+   {
+    "valid_time": "2026-11-13T09:00:00Z",
+    "grid": "cape_f201.json"
+   },
+   {
+    "valid_time": "2026-11-13T12:00:00Z",
+    "grid": "cape_f204.json"
+   },
+   {
+    "valid_time": "2026-11-13T15:00:00Z",
+    "grid": "cape_f207.json"
+   },
+   {
+    "valid_time": "2026-11-13T18:00:00Z",
+    "grid": "cape_f210.json"
+   },
+   {
+    "valid_time": "2026-11-13T21:00:00Z",
+    "grid": "cape_f213.json"
+   },
+   {
+    "valid_time": "2026-11-14T00:00:00Z",
+    "grid": "cape_f216.json"
+   },
+   {
+    "valid_time": "2026-11-14T03:00:00Z",
+    "grid": "cape_f219.json"
+   },
+   {
+    "valid_time": "2026-11-14T06:00:00Z",
+    "grid": "cape_f222.json"
+   },
+   {
+    "valid_time": "2026-11-14T09:00:00Z",
+    "grid": "cape_f225.json"
+   },
+   {
+    "valid_time": "2026-11-14T12:00:00Z",
+    "grid": "cape_f228.json"
+   },
+   {
+    "valid_time": "2026-11-14T15:00:00Z",
+    "grid": "cape_f231.json"
+   },
+   {
+    "valid_time": "2026-11-14T18:00:00Z",
+    "grid": "cape_f234.json"
+   },
+   {
+    "valid_time": "2026-11-14T21:00:00Z",
+    "grid": "cape_f237.json"
+   },
+   {
+    "valid_time": "2026-11-15T00:00:00Z",
+    "grid": "cape_f240.json"
+   }
+  ]
+ },
+ "rain": {
+  "label": "Hujan",
+  "units": "mm/jam",
+  "source": "GFS PRATE",
+  "frames": [
+   {
+    "valid_time": "2026-11-05T00:00:00Z",
+    "grid": "rain_f000.json"
+   },
+   {
+    "valid_time": "2026-11-05T03:00:00Z",
+    "grid": "rain_f003.json"
+   },
+   {
+    "valid_time": "2026-11-05T06:00:00Z",
+    "grid": "rain_f006.json"
+   },
+   {
+    "valid_time": "2026-11-05T09:00:00Z",
+    "grid": "rain_f009.json"
+   },
+   {
+    "valid_time": "2026-11-05T12:00:00Z",
+    "grid": "rain_f012.json"
+   },
+   {
+    "valid_time": "2026-11-05T15:00:00Z",
+    "grid": "rain_f015.json"
+   },
+   {
+    "valid_time": "2026-11-05T18:00:00Z",
+    "grid": "rain_f018.json"
+   },
+   {
+    "valid_time": "2026-11-05T21:00:00Z",
+    "grid": "rain_f021.json"
+   },
+   {
+    "valid_time": "2026-11-06T00:00:00Z",
+    "grid": "rain_f024.json"
+   },
+   {
+    "valid_time": "2026-11-06T03:00:00Z",
+    "grid": "rain_f027.json"
+   },
+   {
+    "valid_time": "2026-11-06T06:00:00Z",
+    "grid": "rain_f030.json"
+   },
+   {
+    "valid_time": "2026-11-06T09:00:00Z",
+    "grid": "rain_f033.json"
+   },
+   {
+    "valid_time": "2026-11-06T12:00:00Z",
+    "grid": "rain_f036.json"
+   },
+   {
+    "valid_time": "2026-11-06T15:00:00Z",
+    "grid": "rain_f039.json"
+   },
+   {
+    "valid_time": "2026-11-06T18:00:00Z",
+    "grid": "rain_f042.json"
+   },
+   {
+    "valid_time": "2026-11-06T21:00:00Z",
+    "grid": "rain_f045.json"
+   },
+   {
+    "valid_time": "2026-11-07T00:00:00Z",
+    "grid": "rain_f048.json"
+   },
+   {
+    "valid_time": "2026-11-07T03:00:00Z",
+    "grid": "rain_f051.json"
+   },
+   {
+    "valid_time": "2026-11-07T06:00:00Z",
+    "grid": "rain_f054.json"
+   },
+   {
+    "valid_time": "2026-11-07T09:00:00Z",
+    "grid": "rain_f057.json"
+   },
+   {
+    "valid_time": "2026-11-07T12:00:00Z",
+    "grid": "rain_f060.json"
+   },
+   {
+    "valid_time": "2026-11-07T15:00:00Z",
+    "grid": "rain_f063.json"
+   },
+   {
+    "valid_time": "2026-11-07T18:00:00Z",
+    "grid": "rain_f066.json"
+   },
+   {
+    "valid_time": "2026-11-07T21:00:00Z",
+    "grid": "rain_f069.json"
+   },
+   {
+    "valid_time": "2026-11-08T00:00:00Z",
+    "grid": "rain_f072.json"
+   },
+   {
+    "valid_time": "2026-11-08T03:00:00Z",
+    "grid": "rain_f075.json"
+   },
+   {
+    "valid_time": "2026-11-08T06:00:00Z",
+    "grid": "rain_f078.json"
+   },
+   {
+    "valid_time": "2026-11-08T09:00:00Z",
+    "grid": "rain_f081.json"
+   },
+   {
+    "valid_time": "2026-11-08T12:00:00Z",
+    "grid": "rain_f084.json"
+   },
+   {
+    "valid_time": "2026-11-08T15:00:00Z",
+    "grid": "rain_f087.json"
+   },
+   {
+    "valid_time": "2026-11-08T18:00:00Z",
+    "grid": "rain_f090.json"
+   },
+   {
+    "valid_time": "2026-11-08T21:00:00Z",
+    "grid": "rain_f093.json"
+   },
+   {
+    "valid_time": "2026-11-09T00:00:00Z",
+    "grid": "rain_f096.json"
+   },
+   {
+    "valid_time": "2026-11-09T03:00:00Z",
+    "grid": "rain_f099.json"
+   },
+   {
+    "valid_time": "2026-11-09T06:00:00Z",
+    "grid": "rain_f102.json"
+   },
+   {
+    "valid_time": "2026-11-09T09:00:00Z",
+    "grid": "rain_f105.json"
+   },
+   {
+    "valid_time": "2026-11-09T12:00:00Z",
+    "grid": "rain_f108.json"
+   },
+   {
+    "valid_time": "2026-11-09T15:00:00Z",
+    "grid": "rain_f111.json"
+   },
+   {
+    "valid_time": "2026-11-09T18:00:00Z",
+    "grid": "rain_f114.json"
+   },
+   {
+    "valid_time": "2026-11-09T21:00:00Z",
+    "grid": "rain_f117.json"
+   },
+   {
+    "valid_time": "2026-11-10T00:00:00Z",
+    "grid": "rain_f120.json"
+   },
+   {
+    "valid_time": "2026-11-10T03:00:00Z",
+    "grid": "rain_f123.json"
+   },
+   {
+    "valid_time": "2026-11-10T06:00:00Z",
+    "grid": "rain_f126.json"
+   },
+   {
+    "valid_time": "2026-11-10T09:00:00Z",
+    "grid": "rain_f129.json"
+   },
+   {
+    "valid_time": "2026-11-10T12:00:00Z",
+    "grid": "rain_f132.json"
+   },
+   {
+    "valid_time": "2026-11-10T15:00:00Z",
+    "grid": "rain_f135.json"
+   },
+   {
+    "valid_time": "2026-11-10T18:00:00Z",
+    "grid": "rain_f138.json"
+   },
+   {
+    "valid_time": "2026-11-10T21:00:00Z",
+    "grid": "rain_f141.json"
+   },
+   {
+    "valid_time": "2026-11-11T00:00:00Z",
+    "grid": "rain_f144.json"
+   },
+   {
+    "valid_time": "2026-11-11T03:00:00Z",
+    "grid": "rain_f147.json"
+   },
+   {
+    "valid_time": "2026-11-11T06:00:00Z",
+    "grid": "rain_f150.json"
+   },
+   {
+    "valid_time": "2026-11-11T09:00:00Z",
+    "grid": "rain_f153.json"
+   },
+   {
+    "valid_time": "2026-11-11T12:00:00Z",
+    "grid": "rain_f156.json"
+   },
+   {
+    "valid_time": "2026-11-11T15:00:00Z",
+    "grid": "rain_f159.json"
+   },
+   {
+    "valid_time": "2026-11-11T18:00:00Z",
+    "grid": "rain_f162.json"
+   },
+   {
+    "valid_time": "2026-11-11T21:00:00Z",
+    "grid": "rain_f165.json"
+   },
+   {
+    "valid_time": "2026-11-12T00:00:00Z",
+    "grid": "rain_f168.json"
+   },
+   {
+    "valid_time": "2026-11-12T03:00:00Z",
+    "grid": "rain_f171.json"
+   },
+   {
+    "valid_time": "2026-11-12T06:00:00Z",
+    "grid": "rain_f174.json"
+   },
+   {
+    "valid_time": "2026-11-12T09:00:00Z",
+    "grid": "rain_f177.json"
+   },
+   {
+    "valid_time": "2026-11-12T12:00:00Z",
+    "grid": "rain_f180.json"
+   },
+   {
+    "valid_time": "2026-11-12T15:00:00Z",
+    "grid": "rain_f183.json"
+   },
+   {
+    "valid_time": "2026-11-12T18:00:00Z",
+    "grid": "rain_f186.json"
+   },
+   {
+    "valid_time": "2026-11-12T21:00:00Z",
+    "grid": "rain_f189.json"
+   },
+   {
+    "valid_time": "2026-11-13T00:00:00Z",
+    "grid": "rain_f192.json"
+   },
+   {
+    "valid_time": "2026-11-13T03:00:00Z",
+    "grid": "rain_f195.json"
+   },
+   {
+    "valid_time": "2026-11-13T06:00:00Z",
+    "grid": "rain_f198.json"
+   },
+   {
+    "valid_time": "2026-11-13T09:00:00Z",
+    "grid": "rain_f201.json"
+   },
+   {
+    "valid_time": "2026-11-13T12:00:00Z",
+    "grid": "rain_f204.json"
+   },
+   {
+    "valid_time": "2026-11-13T15:00:00Z",
+    "grid": "rain_f207.json"
+   },
+   {
+    "valid_time": "2026-11-13T18:00:00Z",
+    "grid": "rain_f210.json"
+   },
+   {
+    "valid_time": "2026-11-13T21:00:00Z",
+    "grid": "rain_f213.json"
+   },
+   {
+    "valid_time": "2026-11-14T00:00:00Z",
+    "grid": "rain_f216.json"
+   },
+   {
+    "valid_time": "2026-11-14T03:00:00Z",
+    "grid": "rain_f219.json"
+   },
+   {
+    "valid_time": "2026-11-14T06:00:00Z",
+    "grid": "rain_f222.json"
+   },
+   {
+    "valid_time": "2026-11-14T09:00:00Z",
+    "grid": "rain_f225.json"
+   },
+   {
+    "valid_time": "2026-11-14T12:00:00Z",
+    "grid": "rain_f228.json"
+   },
+   {
+    "valid_time": "2026-11-14T15:00:00Z",
+    "grid": "rain_f231.json"
+   },
+   {
+    "valid_time": "2026-11-14T18:00:00Z",
+    "grid": "rain_f234.json"
+   },
+   {
+    "valid_time": "2026-11-14T21:00:00Z",
+    "grid": "rain_f237.json"
+   },
+   {
+    "valid_time": "2026-11-15T00:00:00Z",
+    "grid": "rain_f240.json"
+   }
+  ]
+ }
+}

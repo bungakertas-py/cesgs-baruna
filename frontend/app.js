@@ -48,35 +48,96 @@ map.createPane("storm"); map.getPane("storm").style.zIndex = 420; map.getPane("s
 map.createPane("admin"); map.getPane("admin").style.zIndex = 450; map.getPane("admin").style.pointerEvents = "none";   // batas negara/provinsi di atas partikel
 
 const BASE_DARK = "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}";
-L.control.attribution({ prefix: false, position: "bottomright" }).addTo(map);
+/* Kontrol atribusi Leaflet DIBUANG 5 November 2026. Dia duduk di pojok
+   kanan bawah, tepat di belakang legenda, dan tulisannya gelap di atas
+   bilah putih jadi tidak terbaca. Kreditnya pindah ke kartu .kredit di
+   atas legenda, sama dengan envirocircle. String attribution di
+   tileLayer sengaja DIBIARKAN walau tidak lagi dirender, supaya sumber
+   alasnya tetap tercatat di kode. */
 L.tileLayer(BASE_DARK, { pane: "basemap", crossOrigin: true, maxZoom: 16,
   attribution: "Esri, HERE, Garmin, FAO, NOAA, USGS" }).addTo(map);
 
 let bottomInset = 0;   // tinggi panel bawah (rute) yg nutup peta -> framing naik ke area kelihatan
+/* Lebar sidebar KANAN (form rute). Ditambah 5 November 2026 waktu panel rute
+   dipecah jadi sidebar kanan + panel bawah. Tanpa ini peta dibingkai seolah
+   lebarnya penuh, lalu separuh Papua hilang di balik sidebar. */
+let rightInset = 0;
+const ZOOM_MIN_DASAR = 2;   // sama dengan minZoom di opsi peta, lihat frameRegion
 function frameRegion() {
   if (!dataBounds || !VIEW_CORE) return;
-  const crs = map.options.crs;
-  const sw = crs.project(VIEW_CORE.getSouthWest()), ne = crs.project(VIEW_CORE.getNorthEast());
-  const cx = (sw.x + ne.x) / 2, cy = (sw.y + ne.y) / 2;
-  let halfW = Math.abs(ne.x - sw.x) / 2, halfH = Math.abs(ne.y - sw.y) / 2;
   const size = map.getSize();
   const inset = Math.min(Math.max(0, bottomInset), Math.max(0, size.y - 140));   // sisakan min 140px peta
-  const visH = Math.max(80, size.y - inset), sr = size.x / visH;                  // rasio AREA KELIHATAN (di atas panel)
-  const cover = inset > 0;   // panel buka: data ISI lebar strip (crop), lebihnya di lintang bisa di-geser
-  if (cover) { if (sr > halfW / halfH) halfH = halfW / sr; else halfW = halfH * sr; }
-  else       { if (sr > halfW / halfH) halfW = halfH * sr; else halfH = halfW / sr; }
-  const box = L.latLngBounds(crs.unproject(L.point(cx - halfW, cy - halfH)), crs.unproject(L.point(cx + halfW, cy + halfH)));
-  const z = map.getBoundsZoom(box, cover, L.point(0, inset));
+  const insetX = Math.min(Math.max(0, rightInset), Math.max(0, size.x - 240));   // sisakan min 240px peta
+  const pad = L.point(insetX, inset);
+
+  /* MUAT PENUH, bukan isi penuh. Diubah 5 November 2026, diminta pemilik.
+     Zoom paling jauh sekarang memperlihatkan SELURUH domain sekaligus, sebab
+     selama rutenya belum diisi tidak ada bagian peta yang lebih penting dari
+     bagian lain.
+
+     Hitungan tangan yang dulu ada di sini DIBUANG. Dia memperlebar kotak ke
+     rasio layar, mencari zoom, memasang view di tengah kotak penuh, lalu
+     menggesernya lagi dengan panBy. Tiga langkah yang masing masing benar
+     tapi gesernya dihitung dua kali, jadi hasilnya domain tergeser ke selatan
+     dan tepi utaranya hilang. Terukur: peta berhenti di 25,2 LU padahal
+     datanya sampai 33 LU.
+
+     fitBounds dengan paddingBottomRight mengerjakan ketiganya sekaligus, dan
+     itu memang gunanya: muat kotak ini ke dalam layar DIKURANGI panel kanan
+     dan panel bawah. */
+  /* REM LAMA DILEPAS DULU. getBoundsZoom memotong hasilnya ke minZoom yang
+     sedang berlaku, jadi begitu minZoom pernah naik dia tidak pernah bisa
+     turun lagi, berapa pun lebar layarnya. Panggilan pertama terjadi sebelum
+     tata letak mapan, hasilnya ketinggian, dan angka itu mengunci semua
+     panggilan berikutnya. Terukur: minZoom macet di 4,00 padahal domainnya
+     muat di 3,50. */
+  map.setMinZoom(ZOOM_MIN_DASAR);
+  /* MENGISI, bukan memuat. Diubah lagi 5 November 2026 sesudah datanya
+     diperlebar jadi 36..200 BT.
+
+     Dulu "memuat penuh" dipakai supaya seluruh domain kelihatan, dan itu
+     benar waktu domainnya masih sempit. Sekarang domainnya sengaja dibuat
+     lebih lebar dari bingkai mana pun, jadi memuat penuh malah menyisakan
+     ruang kosong yang besarnya ikut ukuran jendela: pas di satu laptop,
+     bersisa di laptop lain.
+
+     Dengan mengisi, bingkai SELALU penuh di jendela berapa pun, dan yang
+     terpotong cuma tepi domain yang memang kelebihan. Titik tengah domain
+     118 BT sama dengan titik tengah Indonesia, dan mengisi itu memusat,
+     jadi Indonesia tetap di tengah. */
+  const z = map.getBoundsZoom(dataBounds, true, pad);
   map.setMinZoom(z);
-  map.setMaxBounds(dataBounds);
-  map.setView(crs.unproject(L.point(cx, cy)), z, { animate: false });
-  if (inset > 0) {
-    map.panBy([0, inset / 2], { animate: false });   // dorong isi peta ke atas panel
-    // perluas batas pan ke selatan sebanyak tinggi panel -> tepi selatan data bisa ditarik ke area kelihatan
-    const dLat = Math.abs(map.containerPointToLatLng([0, 0]).lat - map.containerPointToLatLng([0, inset]).lat);
-    map.setMaxBounds(L.latLngBounds(L.latLng(dataBounds.getSouth() - dLat, dataBounds.getWest()),
-                                    L.latLng(dataBounds.getNorth(), dataBounds.getEast())));
-  }
+
+  /* Rem dilepas DULU, posisinya dipasang BELAKANGAN. fitBounds saja tidak
+     cukup: batas geser yang masih terpasang dari panggilan sebelumnya
+     menjepit hasilnya, dan domain terdorong mentok ke timur sampai seluruh
+     ruang kosong menumpuk di barat. Terukur: peta mulai dari 37 BT, Afrika
+     ikut kelihatan, padahal datanya baru mulai di 60 BT. */
+  map.setMaxBounds(null);
+  map.setView(dataBounds.getCenter(), z, { animate: false });
+  /* Titik tengah domain digeser dari tengah JENDELA ke tengah BAGIAN PETA,
+     yaitu jendela dikurangi sidebar kanan dan panel bawah. Diminta pemilik:
+     Indonesia di tengah bingkai peta, bukan di tengah layar. */
+  if (insetX || inset) map.panBy([insetX / 2, inset / 2], { animate: false });
+
+  /* Batas geser diperluas sebanyak ukuran panel, supaya tepi data yang
+     tertutup panel masih bisa ditarik ke bagian yang kelihatan. */
+  const dLat = Math.abs(map.containerPointToLatLng([0, 0]).lat - map.containerPointToLatLng([0, inset]).lat);
+  const dLon = Math.abs(map.containerPointToLatLng([0, 0]).lng - map.containerPointToLatLng([insetX, 0]).lng);
+  /* Diperluas KE DUA SISI, bukan cuma ke timur. Domainnya lebih jangkung
+     daripada ruang yang tersedia, jadi selalu ada sisa ruang mendatar. Kalau
+     batas geser cuma dilonggarkan ke timur, rem di sisi barat mendorong
+     seluruh sisa itu menumpuk di kanan dan peta terlihat seperti ditempel
+     miring. Dilonggarkan dua duanya, sisanya terbagi rata. */
+  /* Batas geser WAJIB mencakup tampilan yang baru saja dipasang. Kalau tidak,
+     dia menarik balik geseran yang barusan dikerjakan dan hasilnya domain
+     terdorong mentok ke timur lagi. Itu yang terjadi kemarin: geseran 166 px
+     dibatalkan diam diam oleh batas yang ditetapkan sesudahnya, tanpa galat,
+     dan kelihatannya seperti panBy tidak jalan padahal jalan. */
+  const longgar = L.latLngBounds(L.latLng(dataBounds.getSouth() - dLat, dataBounds.getWest() - dLon),
+                                 L.latLng(dataBounds.getNorth(), dataBounds.getEast() + dLon));
+  longgar.extend(map.getBounds());
+  map.setMaxBounds(longgar);
 }
 
 /* ---- Batas administrasi (negara solid, provinsi putus-putus) ala Nimbus ---- */
@@ -144,7 +205,10 @@ function buildTicks() {
 }
 function updateRangeFill() {
   const sl = $("time-slider"), pct = sl.max > 0 ? (sl.value / sl.max) * 100 : 0;
-  sl.style.setProperty("--fill", pct.toFixed(2) + "%");
+  // Dipasang di INDUKNYA, bukan di slidernya. Label jam .tl-cur itu saudara
+  // slider, bukan anaknya, dan variabel CSS cuma menurun ke bawah. Dari induk
+  // dua duanya kebagian.
+  sl.parentElement.style.setProperty("--fill", pct.toFixed(2) + "%");
 }
 
 /* ---- Velocity (partikel) ---- */
@@ -276,9 +340,19 @@ const PARAM_INFO = {
 /* ---- Init ---- */
 fetch(DATA, { cache: "no-store" }).then((r) => r.json()).then((doc) => {
   OC = doc;
-  const v = OC.view;
+  /* BINGKAI = SELURUH DOMAIN DATA, bukan kotak sempit `view`.
+     Diubah 5 November 2026 supaya sama dengan Atmosight di data GFS.
+     `view` dulu memangkasnya jadi 72..168 BT dan 22 LU/LS, padahal
+     datanya sendiri sampai 60..180 BT dan 33 derajat. Yang terpangkas
+     itu justru tempat siklon tropis lahir, di utara Filipina dan di
+     barat laut Australia, jadi lapisan siklon yang akan ditambahkan
+     tidak akan pernah terlihat utuh.
+     Diambil dari bounds lapisan, bukan diketik, supaya kalau backend
+     memperluas domainnya bingkai ini ikut sendiri. */
+  const lb = (OC.layers && (OC.layers.arus || OC.layers.angin)) ? (OC.layers.arus || OC.layers.angin).bounds : null;
+  const v = lb || OC.view;
   VIEW_CORE = L.latLngBounds([v.latS, v.lonW], [v.latN, v.lonE]);
-  dataBounds = VIEW_CORE;   // pan dibatasi ke domain kecil
+  dataBounds = VIEW_CORE;   // pan dikunci ke domain penuh
   frameRegion();
   loadAdmin();
   map.on("resize", frameRegion);
@@ -294,4 +368,5 @@ window.BARUNA_MAP = map;
 /* Dipanggil rute.js: setInset simpan tinggi panel (dipakai frameRegion); reframe jalankan ulang
    framing domain. Dipisah biar fit-rute (gambarPeta) nggak ketimpa reframe domain. */
 window.BARUNA_setInset = function (px) { bottomInset = Math.max(0, px || 0); };
+window.BARUNA_setInsetX = function (px) { rightInset = Math.max(0, px || 0); };
 window.BARUNA_reframe = function () { frameRegion(); };

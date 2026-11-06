@@ -9,55 +9,74 @@
    Sumber token: Style/atmospheric_glass/DESIGN.md
    ================================================================ */
 :root {
-  /* ---- Warna aksen ---- */
-  --primary: #9698ff;
-  --primary-mid: #6063ee;
-  --primary-deep: #4648d4;
+  /* ---- Warna aksen (gaya "raja", dicuplik dari envirocircle/atmosight) ----
+     Palet colorhunt 074173-1679AB-5DEBD7-C5FF95. Kertas putih, tinta biru tua,
+     garis rambut, tanpa bayangan. Nama token SENGAJA tetap sama dengan versi
+     kaca, cukup ganti nilainya dan seluruh perabot ikut berubah. */
+  --primary: #1679AB;
+  --primary-mid: #1679AB;
+  --primary-deep: #115F86;
   --on-primary: #ffffff;
-  --secondary: #6ac9ff;
-  --secondary-deep: #0090c8;
-  --tertiary: #ff8fc4;
-  --error: #ff6b6b;
-  --warm: #ff8a80;                 /* anomali hangat */
-  --cool: #7cc4ff;                 /* anomali dingin */
+  --secondary: #1679AB;
+  --secondary-deep: #115F86;
+  --tertiary: #1679AB;
+  --error: #c0392b;
+  --warm: #c0392b;                 /* anomali hangat */
+  --cool: #1679AB;                 /* anomali dingin */
 
-  --ink: #eef0ff;
-  --variant: #b3bbd6;
-  --outline: #8b93ad;
-  --line: rgba(255, 255, 255, 0.12);
-  --line-strong: rgba(255, 255, 255, 0.2);
+  --aksen: #1679AB;
+  --aksen-tua: #115F86;
+  --lime: #C5FF95;                 /* bidang aktif/hover — huruf TINTA, bukan putih */
+  --on-lime: #074173;
+  --sorot: #5DEBD7;
+  --sorot-tipis: rgba(93, 235, 215, .22);
 
-  --paper: #f7f8fd;                /* latar kertas untuk plot data */
-  --paper-ink: #3f4759;
+  --ink: #074173;                  /* tinta biru tua: semua teks & garis */
+  --variant: rgba(7, 65, 115, .5);
+  --outline: rgba(7, 65, 115, .5);
+  --ink-70: rgba(7, 65, 115, .7);
+  --ink-50: rgba(7, 65, 115, .5);
+  --ink-20: rgba(7, 65, 115, .2);
+  --ink-5:  rgba(7, 65, 115, .05);
+  --line: rgba(7, 65, 115, .2);
+  --line-strong: rgba(7, 65, 115, .35);
 
-  /* ---- Kaca gelap ---- */
-  --glass-soft: rgba(12, 18, 34, 0.26);
-  --glass: rgba(12, 18, 34, 0.36);
-  --glass-strong: rgba(12, 18, 34, 0.54);
-  --glass-brd: rgba(255, 255, 255, 0.16);
-  --glass-brd-strong: rgba(255, 255, 255, 0.24);
-  --glass-inset: rgba(255, 255, 255, 0.07);
-  --fill-1: rgba(255, 255, 255, 0.07);
-  --fill-2: rgba(255, 255, 255, 0.12);
-  --blur: 14px;
-  --blur-lg: 26px;
+  --paper: #ffffff;                /* latar kertas untuk plot data */
+  --paper-ink: #074173;
 
-  --shadow: 0 8px 32px rgba(0, 0, 0, 0.34);
-  --shadow-sm: 0 4px 16px rgba(0, 0, 0, 0.26);
-  --shadow-lg: 0 16px 44px rgba(0, 0, 0, 0.44);
-  --rim: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  /* ---- Permukaan padat (dulu kaca, sekarang kertas) ---- */
+  --surface: #ffffff;
+  --surface-low: #F6FBFB;
+  --surface-high: #E9F7F6;
+  --surface-highest: #C8ECE9;
+  --glass-soft: #ffffff;
+  --glass: #ffffff;
+  --glass-strong: #ffffff;
+  --glass-brd: rgba(7, 65, 115, .2);
+  --glass-brd-strong: rgba(7, 65, 115, .35);
+  --glass-inset: #F6FBFB;
+  --fill-1: rgba(7, 65, 115, .05);
+  --fill-2: rgba(7, 65, 115, .1);
+  --blur: 0px;                     /* blur dimatikan: tidak ada kaca lagi */
+  --blur-lg: 0px;
 
-  /* ---- Bentuk ---- */
-  --r-panel: 16px;
-  --r-card: 12px;
-  --r-btn: 8px;
-  --r-sm: 6px;
+  --bw: 0.7px;                     /* garis rambut, bukan 3px */
+  --shadow: none;                  /* raja: tanpa bayangan */
+  --shadow-sm: none;
+  --shadow-lg: none;
+  --rim: 0 0 transparent;
+
+  /* ---- Bentuk: sudut lembut tipis ---- */
+  --r-panel: 4px;
+  --r-card: 4px;
+  --r-btn: 4px;
+  --r-sm: 3px;
   --r-full: 9999px;
 
-  /* ---- Huruf ---- */
-  --font-display: "Inter", system-ui, sans-serif;
-  --font-ui: "Inter", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  /* ---- Huruf: Geologica satu keluarga (seperti raja) ---- */
+  --font-display: "Geologica", ui-sans-serif, system-ui, sans-serif;
+  --font-ui: "Geologica", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geologica", ui-sans-serif, system-ui, sans-serif;
 
   /* ---- Ukuran kontrol, ikut tinggi layar ----
      Semua panel mengambang memakai angka dari sini, jadi layout bisa
@@ -1184,3 +1203,569 @@ html, body {
   .timeline { max-width: 1180px; }
   .legend-col { margin-left: auto; }
 }
+
+/* ============================================================
+   RESKIN GAYA "RAJA" (envirocircle/atmosight) — ditempel paling akhir.
+   Token :root sudah: kertas putih, tinta biru #074173, garis rambut,
+   tanpa bayangan, Geologica. Di bawah ini BENTUK komponennya disamakan
+   dengan envirocircle versi sekarang: kartu putih di atas, pemilih layer
+   jadi daftar kolom, dan BILAH BAWAH jadi satu bidang putih selebar layar
+   dengan garis rambut di atasnya (bukan dua panel kaca mengambang).
+   ============================================================ */
+
+/* Garis rambut tinta pada chrome utama */
+.panel, .icon-btn, .zoom, .lang, .legend-panel, .select-wrap select, .about-card {
+  border: var(--bw) solid var(--ink-20); box-shadow: none;
+}
+/* Matikan halo bayangan teks/ikon (dulu buat latar gelap) */
+.brand-text strong, .about-name, .pl-txt strong { text-shadow: none; }
+.icon-btn .material-symbols-outlined, .zoom button .material-symbols-outlined,
+.layer-btn .material-symbols-outlined, .tl-btn .material-symbols-outlined { filter: none; }
+
+/* ---- Pemilih layer: daftar kolom putih, bukan rel ikon mengambang ---- */
+.panel.layers {
+  flex-direction: column; width: 224px; gap: 0; padding: 0;
+  background: var(--surface); border: var(--bw) solid var(--ink-20); box-shadow: none;
+}
+.layer-btn {
+  position: static; width: 100%; height: auto; flex: none;
+  justify-content: flex-start; gap: 12px; padding: 10px 16px;
+  border: 0; border-bottom: var(--bw) solid var(--ink-20); border-radius: 0;
+  background: transparent; color: var(--ink);
+  font-family: var(--font-ui); font-weight: 400; font-size: 13px;
+  letter-spacing: .04em; text-transform: uppercase;
+}
+.layer-btn:last-child { border-bottom: 0; }
+.layer-btn .material-symbols-outlined { color: var(--aksen); font-size: 20px; }
+.layer-btn:hover:not(.disabled):not(.active) { background: var(--surface-high); transform: none; box-shadow: none; }
+.layer-btn.active { background: var(--lime); color: var(--on-lime); box-shadow: none; }
+.layer-btn.active .material-symbols-outlined { color: var(--on-lime); }
+/* nama layer: inline biasa, bukan pil mengambang */
+.layer-btn .lb-txt {
+  position: static; transform: none; padding: 0; border: 0; background: transparent;
+  box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none;
+  color: inherit; font: inherit; letter-spacing: inherit; opacity: 1;
+}
+.lb-info {
+  border: var(--bw) solid var(--ink-20); background: var(--surface);
+  color: var(--ink-50); font-weight: 600;
+}
+.lb-info:hover { background: var(--aksen); color: #fff; }
+
+/* ---- Tombol ikon kanan + semua status AKTIF = bidang lime, huruf tinta ---- */
+.icon-btn.active, .lang button.active, .depth-pill.active, .model-wrap.open #model-toggle {
+  background: var(--lime); color: var(--on-lime); border-color: var(--ink-20); box-shadow: none;
+}
+.icon-btn.active .material-symbols-outlined,
+.model-wrap.open #model-toggle .material-symbols-outlined { color: var(--on-lime); }
+.index-opt.active { background: var(--lime); color: var(--on-lime); box-shadow: none; }
+.col.items-end [data-tip]::after {
+  border: var(--bw) solid var(--ink-20); background: var(--surface); color: var(--ink);
+  box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none;
+}
+
+/* ---- BILAH BAWAH: satu bidang putih selebar layar, garis rambut di atas ---- */
+.ui-bottom {
+  margin: 0 calc(var(--ui-pad) * -1) calc(var(--ui-pad) * -1);
+  padding: 12px 20px; gap: 24px; align-items: center;
+  background: var(--paper); border-top: var(--bw) solid var(--ink-20); pointer-events: auto;
+}
+.ui-bottom .panel.timeline {
+  flex: 1; min-width: 0; gap: 16px;
+  background: transparent; border: 0; box-shadow: none; padding: 0;
+}
+.tl-btn {
+  width: 34px; height: 34px; border-radius: 999px;
+  background: transparent; color: var(--aksen); border: var(--bw) solid var(--ink-20); box-shadow: none;
+}
+.tl-btn:hover:not(:disabled) { border-color: var(--ink); background: transparent; transform: none; box-shadow: none; }
+.tl-btn .material-symbols-outlined { color: var(--aksen); }
+
+/* Slider jadi pil: alur isian aksen (pakai --fill dari app.js), gagang titik berongga */
+#time-slider { height: 16px; }
+#time-slider::-webkit-slider-runnable-track {
+  height: 8px; border: 0; border-radius: 999px;
+  background: linear-gradient(to right, var(--aksen) 0 var(--fill, 0%), var(--ink-20) var(--fill, 0%) 100%);
+}
+#time-slider::-moz-range-track { height: 8px; border: 0; border-radius: 999px; background: var(--ink-20); }
+#time-slider::-moz-range-progress { height: 8px; border-radius: 999px; background: var(--aksen); }
+#time-slider::-webkit-slider-thumb {
+  width: 14px; height: 14px; margin-top: -3px; border-radius: 999px;
+  background: var(--paper); border: 2px solid var(--aksen); box-shadow: none;
+}
+#time-slider::-moz-range-thumb { width: 14px; height: 14px; border-radius: 999px; background: var(--paper); border: 2px solid var(--aksen); box-shadow: none; }
+.tl-cur .mono { background: transparent; color: var(--ink); font-weight: 300; letter-spacing: .08em; padding: 0; }
+.tl-tick-mark { background: var(--ink-20); }
+.tl-tick.day .tl-tick-mark { background: var(--aksen); }
+.tl-tick-lbl { color: var(--ink-50); }
+.tl-tick.day .tl-tick-lbl { color: var(--ink); font-weight: 400; }
+
+/* ---- Legenda: kapsul garis rambut, kepala aksen biru ---- */
+.legend-col { gap: 6px; }
+.legend-panel { border: var(--bw) solid var(--ink-20); box-shadow: none; background: var(--surface); }
+.legend-head { background: var(--aksen); color: #fff; border-right: var(--bw) solid var(--ink-20); }
+.legend-cell { color: var(--ink); }
+
+/* Badge data (fresh) + toast + kartu modal: datar tanpa blur/bayangan */
+.fresh-badge { backdrop-filter: none; -webkit-backdrop-filter: none; box-shadow: none; }
+.toast, .about-card, .param-card {
+  backdrop-filter: none; -webkit-backdrop-filter: none; box-shadow: none;
+  border: var(--bw) solid var(--ink-20);
+}
+.about-overlay { background: rgba(7, 65, 115, .28); backdrop-filter: none; -webkit-backdrop-filter: none; }
+
+/* Scrim gradien hitam dari atas: logo CESGS + nama Baruna lebih kebaca di peta */
+.scrim {
+  position: absolute; top: 0; left: 0; right: 0; height: 150px;
+  z-index: 400; pointer-events: none;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, .45), rgba(0, 0, 0, 0));
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 36%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 36%, transparent 100%);
+}
+
+/* ============================================================
+   RESKIN LANJUTAN, 5 November 2026. Bentuk komponen disamakan
+   dengan envirocircle versi repo sekarang, bukan versi live.
+   Isinya tetap punya Baruna, yang diganti cuma bentuknya.
+   ============================================================ */
+
+/* ---- Legenda jadi SATU BATANG UTUH ----
+   Kotak satuan MENYATU dengan pita warna, dipisah cuma oleh satu garis,
+   bukan berdiri sendiri dengan jarak di antaranya. Bingkainya dipegang
+   .legend-panel, bukan .legend-head. Kalau dibiarkan di kotak satuan,
+   garis di tempat keduanya bertemu jadi dua lapis. */
+.legend-panel {
+  display: flex; align-items: stretch; gap: 0; padding: 0;
+  overflow: hidden;              /* sudutnya memotong sel warna di ujung */
+  background: var(--surface); box-shadow: none;
+  border: var(--bw) solid var(--ink-20); border-radius: 3px;
+  backdrop-filter: none; -webkit-backdrop-filter: none;
+}
+.legend-head {
+  display: flex; align-items: center;
+  padding: 7px 12px; background: transparent; color: var(--ink);
+  border: 0; border-right: var(--bw) solid var(--ink-20); border-radius: 0;
+  font-family: var(--font-ui); font-size: 10px; font-weight: 300;
+  letter-spacing: .14em; text-transform: uppercase;
+}
+/* Antar sel warna SENGAJA tidak digaris. Warna selnya itu DATA, dan batas
+   antar warna sudah jadi pemisahnya sendiri. Yang digaris cuma sambungan
+   ke kotak satuan, sebab di situ memang tidak ada beda warna. */
+.legend { border: 0; border-radius: 0; overflow: visible; padding: 0; }
+.legend-cell { border: 0; border-radius: 0; min-height: 26px; }
+.legend-cell:first-child, .legend-cell:last-child { border-radius: 0; }
+
+/* ---- Badge data: tenang, bukan pil merah mengambang ----
+   Dulu absolut di atas bilah sebab bilahnya panel kecil melayang. Sekarang
+   bilahnya menembus lebar layar, jadi tempatnya DI DALAM barisnya. */
+.fresh-badge {
+  position: static; order: 5; flex: none;
+  background: transparent; color: var(--ink-50);
+  border: var(--bw) solid var(--ink-20); border-radius: 999px;
+  padding: 5px 12px; box-shadow: none;
+  font-family: var(--font-ui); font-size: 11px; font-weight: 200; letter-spacing: .06em;
+  backdrop-filter: none; -webkit-backdrop-filter: none;
+}
+.fresh-badge .fresh-ico { font-size: 14px; color: inherit; }
+
+/* ---- Jam berlaku mengambang DI ATAS batang waktu ----
+   Ditempel absolut supaya tidak ikut menambah tinggi barisnya, dan rata
+   kiri mengikuti awal slider, bukan menggantung di kanan. */
+.tl-main { position: relative; }
+.tl-cur {
+  position: absolute; left: 0; bottom: calc(100% + 6px);
+  display: block; margin: 0; white-space: nowrap; justify-content: flex-start;
+}
+.tl-cur .mono {
+  font-family: var(--font-ui); font-size: 11px; font-weight: 300;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--ink-50); background: transparent; padding: 0;
+}
+
+/* ---- Kredit sumber data ----
+   Wajib ada. Arus Baruna dari CMEMS, dan lisensinya menuntut kalimat
+   "Generated using E.U. Copernicus Marine Service Information" disebut.
+   Tanpa kotak, rata kanan, duduk tepat di atas legenda. */
+.kredit {
+  max-width: 340px; margin-left: auto; margin-bottom: 6px;
+  text-align: right; font-size: 9px; font-weight: 200; line-height: 1.5;
+  letter-spacing: .01em; color: var(--ink-50); pointer-events: none;
+}
+.kredit-alas { display: block; margin-top: 2px; color: var(--ink-50); opacity: .75; }
+@media (max-width: 640px) {
+  /* Dipatok ke lebar JENDELA, bukan 100% induknya. Di HP .legend-col ada di
+     dalam .ui-bottom yang bermargin negatif, jadi 100% di sini justru lebih
+     lebar dari layar dan barisnya terpotong tepi kanan. */
+  .kredit { max-width: calc(100vw - 24px); margin-bottom: 4px; font-size: 8px; line-height: 1.4; }
+}
+
+/* ============================================================
+   IDENTITAS POJOK KIRI ATAS, dilucuti dari kotaknya.
+   Diminta pemilik 5 November 2026 dengan contoh Atmosight. Nama
+   aplikasi berdiri langsung di atas peta, bukan di dalam kartu
+   putih. Yang menahan teksnya tetap terbaca itu .scrim gelap yang
+   sudah terpasang di puncak layar, bukan bidang di belakangnya.
+   ============================================================ */
+.brand-row, .panel.brand {
+  background: transparent; border: 0; box-shadow: none; padding: 0;
+  border-radius: 0; backdrop-filter: none; -webkit-backdrop-filter: none;
+}
+.brand { display: flex; align-items: center; gap: 13px; }
+.brand-logo { width: 46px; height: 46px; }
+.brand-text strong {
+  display: block;
+  font-family: var(--font-ui); font-weight: 300; font-size: 19px;
+  letter-spacing: .17em; text-transform: uppercase; color: #fff;
+}
+.brand-text span {
+  display: block; font-size: 12px; font-weight: 200;
+  letter-spacing: .05em; color: rgba(255, 255, 255, .72); margin-top: 4px;
+}
+.brand-info {
+  background: transparent; border: 0; box-shadow: none;
+  color: rgba(255, 255, 255, .72);
+}
+.brand-info:hover { background: transparent; color: #fff; }
+/* Tautan ke Nimbus TETAP berkotak, tapi kotaknya gelap tembus pandang,
+   bukan putih. Dia tautan keluar, jadi memang harus terbaca sebagai
+   sesuatu yang bisa diketuk, beda dengan nama aplikasi yang cuma label. */
+.sibling-link {
+  background: rgba(0, 0, 0, .55); color: #fff;
+  border: var(--bw) solid rgba(255, 255, 255, .28); border-radius: 4px;
+  box-shadow: none;
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+}
+.sibling-link strong { font-weight: 300; letter-spacing: .1em; text-transform: uppercase; font-size: 12px; color: #fff; }
+.sibling-link span { font-weight: 200; font-size: 11px; color: rgba(255, 255, 255, .7); }
+.sibling-link .pl-ico, .sibling-link .pl-go { color: rgba(255, 255, 255, .72); }
+
+/* Scrim atas dipertinggi sedikit, sebab sekarang dia yang menahan dua baris
+   teks putih plus tautan Nimbus di bawahnya, bukan cuma satu kartu. */
+.scrim { height: 190px; }
+
+/* ============================================================
+   SLIDER DAN LEGENDA MELAYANG DI ATAS PETA, 5 November 2026.
+   Diminta pemilik. Dulu keduanya duduk di bilah putih selebar
+   layar. Sekarang bilah itu dipakai panel ulasan rute, dan peta
+   sendiri menyempit sebab sidebar kanan memakan lebar. Jadi
+   keduanya naik ke atas peta sebagai kartu kecil, dan ukurannya
+   diturunkan supaya tidak menelan peta yang sudah sempit.
+   ============================================================ */
+.ui-bottom {
+  margin: 0; padding: 0; gap: 14px;
+  align-items: flex-end;
+  background: transparent; border-top: 0;
+}
+/* Kotak waktu kembali jadi kartu putih, sebab sekarang dia berdiri di atas
+   peta berwarna dan butuh bidangnya sendiri supaya terbaca. */
+.ui-bottom .panel.timeline {
+  flex: 1; min-width: 0; max-width: 560px;
+  gap: 12px; padding: 8px 14px;
+  background: var(--paper); border: var(--bw) solid var(--ink-20); border-radius: 3px;
+  box-shadow: none; pointer-events: auto;
+}
+.tl-btn { width: 28px; height: 28px; }
+.tl-btn .material-symbols-outlined { font-size: 17px; }
+.tl-cur .mono { font-size: 10px; letter-spacing: .1em; }
+.tl-ticks { height: 15px; }
+.tl-tick-lbl { font-size: 8px; margin-top: 2px; }
+#time-slider { height: 14px; }
+#time-slider::-webkit-slider-runnable-track, #time-slider::-moz-range-track { height: 6px; }
+#time-slider::-moz-range-progress { height: 6px; }
+#time-slider::-webkit-slider-thumb { width: 12px; height: 12px; margin-top: -3px; }
+#time-slider::-moz-range-thumb { width: 12px; height: 12px; }
+
+/* Badge data keluar dari kotak waktu, berdiri sendiri di sebelahnya, supaya
+   kotaknya tidak melebar cuma demi menampung dia. */
+.fresh-badge { padding: 4px 10px; font-size: 10px; }
+.fresh-badge .fresh-ico { font-size: 12px; }
+
+/* Legenda mengecil. Lebar sel turun dari 40 ke 30, dan tingginya ikut, sebab
+   angkanya cuma perlu terbaca bukan jadi tulang punggung tampilan. */
+.legend-col { gap: 5px; }
+.legend-head { padding: 5px 9px; font-size: 9px; letter-spacing: .12em; }
+.legend-cell { width: 30px; min-height: 20px; font-size: 9.5px; }
+.legend-words .legend-cell { min-width: 36px; padding: 0 9px; }
+.kredit { max-width: 290px; margin-bottom: 5px; font-size: 8px; line-height: 1.45; }
+
+/* Dua teks ini sekarang berdiri di atas PETA, bukan di atas bilah putih,
+   jadi tinta navy di situ tidak terlihat sama sekali. Diputihkan dan diberi
+   halo, cara yang sama dipakai Oceansight untuk teks di atas peta. */
+.tl-cur .mono { color: #fff; text-shadow: 0 1px 3px rgba(0, 0, 0, .75); }
+.kredit { color: rgba(255, 255, 255, .72); text-shadow: 0 1px 3px rgba(0, 0, 0, .7); }
+.kredit-alas { color: rgba(255, 255, 255, .55); }
+
+/* Label tanggal di kedua UJUNG dibuang, marknya tetap. Tick ujung itu jatuh
+   nyaris menempel pada tick hari pertama dan terakhir, jadi tulisannya
+   bertindihan. Hari yang hilang tetap terbaca di label waktu berjalan. */
+.tl-tick.edge-start .tl-tick-lbl, .tl-tick.edge-end .tl-tick-lbl { display: none; }
+
+/* Kredit dirapatkan ke legenda. Di atas peta dia tidak punya bidang sendiri,
+   jadi kalau terlalu lebar dia terbaca seperti tulisan yang tercecer di laut
+   bukan keterangan milik legenda di bawahnya. */
+.kredit { max-width: 258px; margin-bottom: 4px; line-height: 1.4; }
+
+/* ============================================================
+   BILAH BAWAH TANPA KOTAK, 5 November 2026, diminta pemilik
+   dengan contoh Atmosight. Slider dan legenda berdiri langsung
+   di atas peta. Yang menahan supaya terbaca bukan bidang putih,
+   tapi scrim gelap yang memudar ke atas, sama seperti di puncak.
+   Blok ini menimpa kartu putih yang sempat kupasang sebelumnya.
+   ============================================================ */
+.scrim--bawah {
+  top: auto; bottom: 0; height: 220px;
+  background: linear-gradient(to top, rgba(0, 0, 0, .58), rgba(0, 0, 0, 0));
+  -webkit-mask-image: linear-gradient(to top, #000 0%, #000 55%, transparent 100%);
+  mask-image: linear-gradient(to top, #000 0%, #000 55%, transparent 100%);
+  -webkit-backdrop-filter: brightness(.62) saturate(.9);
+  backdrop-filter: brightness(.62) saturate(.9);
+}
+/* Scrim itu berposisi dan ber-z-index, sedangkan bilah bawah elemen biasa.
+   Tanpa z-index di sini, scrim digambar DI ATAS slider dan legenda, dan
+   semuanya terlihat pudar seperti tertutup kabut. */
+.ui-bottom { position: relative; z-index: 20; justify-content: space-between; gap: 8px; }
+
+/* Kotak waktu kehilangan bidangnya dan MEMANJANG sampai mentok legenda. */
+.ui-bottom .panel.timeline {
+  flex: 1 1 auto; min-width: 0; max-width: none;
+  background: transparent; border: 0; box-shadow: none; padding: 0; gap: 16px;
+}
+.legend-col { flex: 0 0 auto; margin-left: 0; }
+
+.tl-btn {
+  background: transparent; color: #fff;
+  border: var(--bw) solid rgba(255, 255, 255, .5); box-shadow: none;
+}
+.tl-btn:hover:not(:disabled) { background: rgba(255, 255, 255, .18); border-color: #fff; transform: none; box-shadow: none; }
+.tl-btn .material-symbols-outlined { color: #fff; }
+
+/* Label jam MENEMPEL DI ATAS GAGANG, bukan menggantung di ujung kiri.
+   --fill diisi updateRangeFill() di app.js. */
+.tl-main { padding-top: 17px; }
+.tl-cur {
+  position: absolute; top: 0; left: var(--fill, 0%); bottom: auto;
+  transform: translateX(-50%); white-space: nowrap; pointer-events: none;
+}
+.tl-cur .mono {
+  font-family: var(--font-ui); font-size: 11px; font-weight: 500;
+  letter-spacing: .06em; text-transform: uppercase;
+  color: #fff; background: transparent; padding: 0; text-shadow: none;
+}
+
+#time-slider::-webkit-slider-runnable-track {
+  height: 7px;
+  background: linear-gradient(to right, #fff 0 var(--fill, 0%), rgba(255, 255, 255, .3) var(--fill, 0%) 100%);
+}
+#time-slider::-moz-range-track { height: 7px; background: rgba(255, 255, 255, .3); }
+#time-slider::-moz-range-progress { height: 7px; background: #fff; }
+#time-slider::-webkit-slider-thumb { background: #fff; border-color: #fff; box-shadow: none; }
+#time-slider::-moz-range-thumb { background: #fff; border-color: #fff; box-shadow: none; }
+
+.tl-tick-mark { background: rgba(255, 255, 255, .32); }
+.tl-tick.day .tl-tick-mark { background: rgba(255, 255, 255, .6); }
+.tl-tick-lbl { color: rgba(255, 255, 255, .45); }
+.tl-tick.day .tl-tick-lbl { color: rgba(255, 255, 255, .8); }
+
+/* Legenda ikut kehilangan bidangnya. Yang tersisa cuma bingkai putih tipis,
+   dan sel warnanya DIBIARKAN berwarna sebab itu data, bukan merek. */
+.legend-panel { background: transparent; border-color: rgba(255, 255, 255, .5); }
+.legend-head { color: #fff; border-right-color: rgba(255, 255, 255, .5); }
+
+.fresh-badge { border-color: rgba(255, 255, 255, .4); color: rgba(255, 255, 255, .78); }
+
+/* Badge waktu data berdiri sendiri di bawah pemilih layer. Dia tidak lagi
+   anak .timeline, jadi aturan position static dan order dari blok sebelumnya
+   sudah tidak berlaku, tinggal diberi jaraknya. */
+.ui-top .col > .fresh-badge { align-self: flex-start; margin-top: 10px; }
+
+/* ============================================================
+   KONTROL DI ATAS PETA DIKECILKAN, 5 November 2026.
+   Patokannya slider dan legenda, bukan sebaliknya. Tombol putar
+   di slider 28px dan sel legenda 20px, jadi tombol 46px di
+   pojok kanan terbaca dua kali lebih berat dari semestinya.
+   Slider dan legenda SENDIRI tidak disentuh di sini.
+   ============================================================ */
+:root {
+  --ctl: 32px;        /* dari 46 */
+  --ctl-ico: 18px;    /* dari 22 */
+  --zoom-btn: 28px;   /* dari 38 */
+}
+.zoom { padding: 3px; gap: 1px; }
+.icon-btn .material-symbols-outlined, .zoom button .material-symbols-outlined { font-size: var(--ctl-ico); }
+
+/* Identitas ikut turun, supaya tidak jadi satu satunya yang besar. */
+.brand-logo { width: 36px; height: 36px; }
+.brand { gap: 10px; }
+.brand-text strong { font-size: 15px; letter-spacing: .16em; }
+.brand-text span { font-size: 10px; margin-top: 3px; }
+.brand-info { width: 24px; height: 24px; }
+.brand-info .material-symbols-outlined { font-size: 16px; }
+
+/* Pemilih layer menyempit mengikuti, hurufnya disamakan dengan kepala
+   legenda supaya dua duanya terbaca satu keluarga. */
+.panel.layers { width: 186px; }
+.layer-btn { padding: 8px 13px; gap: 10px; font-size: 11px; letter-spacing: .1em; }
+.layer-btn .material-symbols-outlined { font-size: 17px; }
+.lb-info { width: 15px; height: 15px; font-size: 9px; }
+
+.ui-top .col > .fresh-badge { margin-top: 8px; }
+
+/* ============================================================
+   5 November 2026, tata ulang diminta pemilik:
+   pemilih parameter pindah ke kolom kanan jadi ikon, identitas
+   pindah ke dalam sidebar, dan scrim atas dibuang sebab tidak
+   ada lagi teks putih yang berdiri di atas peta.
+   ============================================================ */
+
+/* ---- Pemilih parameter jadi ikon di kolom kanan ---- */
+.col.items-end .panel.layers {
+  flex-direction: column; width: auto; gap: 0; padding: 0;
+  background: var(--paper); border: var(--bw) solid var(--ink-20);
+  border-radius: 3px; overflow: hidden; box-shadow: none;
+}
+.col.items-end .layer-btn {
+  width: var(--ctl); height: var(--ctl); padding: 0;
+  justify-content: center; gap: 0;
+  border: 0; border-bottom: var(--bw) solid var(--ink-20); border-radius: 0;
+}
+.col.items-end .layer-btn:last-child { border-bottom: 0; }
+/* Nama parameter DISEMBUNYIKAN, bukan dibuang dari markup. Dia masih
+   dibaca pembaca layar lewat aria, dan gelembung data-tip yang muncul
+   waktu disentuh memakai aturan yang sudah ada di kolom ini. */
+.col.items-end .layer-btn .lb-txt {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap;
+}
+.col.items-end .layer-btn .material-symbols-outlined { font-size: var(--ctl-ico); }
+
+/* ---- Identitas di dalam sidebar ----
+   Hurufnya kembali TINTA. Di atas peta dia putih berhalo, dan kalau
+   aturan itu terbawa ke sini teksnya jadi putih di atas kertas putih,
+   hilang sama sekali tanpa galat apa pun. */
+.rt-ident {
+  padding: 16px 18px 12px; border-bottom: var(--bw) solid var(--ink-20);
+  display: flex; flex-direction: column; gap: 10px;
+}
+.rt-ident .brand-row { display: flex; flex-direction: column; gap: 10px; }
+.rt-ident .brand { gap: 11px; }
+.rt-ident .brand-logo { width: 34px; height: 34px; }
+.rt-ident .brand-text strong { color: var(--ink); font-size: 14px; letter-spacing: .15em; }
+.rt-ident .brand-text span { color: var(--ink-50); font-size: 10px; }
+.rt-ident .brand-info { color: var(--ink-50); }
+.rt-ident .brand-info:hover { color: var(--aksen); }
+.rt-ident .fresh-badge {
+  align-self: flex-start; margin: 0;
+  border-color: var(--ink-20); color: var(--ink-50);
+}
+/* Tautan ke Nimbus kembali jadi kartu terang, sebab latarnya sekarang
+   kertas putih bukan peta gelap. */
+.rt-ident .sibling-link {
+  background: var(--surface-low); border-color: var(--ink-20);
+  backdrop-filter: none; -webkit-backdrop-filter: none;
+}
+.rt-ident .sibling-link strong { color: var(--ink); }
+.rt-ident .sibling-link span { color: var(--ink-50); }
+.rt-ident .sibling-link .pl-ico, .rt-ident .sibling-link .pl-go { color: var(--aksen); }
+
+/* Tautan ke Nimbus TERBUKA di dalam sidebar. Aturan dasarnya menyetel
+   max-width 0 dan opacity 0, lalu membukanya cuma waktu .brand-row dapat
+   kelas .nav-open, dan kelas itu tidak pernah dipasang siapa pun. Jadi
+   tautannya tidak pernah terlihat sejak dulu, bukan baru sekarang. */
+.rt-ident .sibling-link {
+  max-width: 100%; opacity: 1; padding: 10px 12px; pointer-events: auto;
+  border-color: var(--ink-20); box-shadow: none; white-space: normal;
+}
+.rt-ident .sibling-link:hover { transform: none; box-shadow: none; background: var(--surface-high); }
+.rt-ident .sibling-link .pl-ico { font-size: 20px; }
+.rt-ident .pl-txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+
+/* ---- Nama parameter DITAMPILKAN di kiri ikonnya ----
+   5 November 2026, diminta pemilik. Urutan markup itu ikon dulu baru
+   nama, jadi dibalik lewat row-reverse supaya namanya jatuh di kiri
+   tanpa menyentuh HTML. Tombolnya tumbuh ke KIRI sendiri sebab kolom
+   ini rata kanan. */
+.col.items-end .panel.layers { width: auto; align-self: flex-end; }
+.col.items-end .layer-btn {
+  width: auto; min-width: var(--ctl); height: var(--ctl);
+  flex-direction: row-reverse; justify-content: flex-start;
+  gap: 10px; padding: 0 11px 0 13px;
+}
+/* Namanya dibuka lagi dari persembunyian pembaca layar. */
+.col.items-end .layer-btn .lb-txt {
+  position: static; width: auto; height: auto; overflow: visible;
+  clip: auto; white-space: nowrap;
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: 11px; letter-spacing: .1em;
+}
+.col.items-end .layer-btn .material-symbols-outlined { flex: none; }
+/* Gelembung data-tip tidak perlu lagi, namanya sudah tertulis. */
+.col.items-end .layer-btn[data-tip]::after { content: none; }
+
+/* ---- Bidangnya CUMA di ikon, namanya telanjang di atas peta ----
+   5 November 2026, diminta pemilik. Yang dulu berkotak itu seluruh tombol
+   termasuk tulisannya. Sekarang kotaknya pindah ke ikonnya saja, sebesar
+   dan sebentuk tombol alat peta di atasnya, dan namanya berdiri sendiri
+   di sebelah kiri tanpa latar. */
+.col.items-end .panel.layers {
+  background: transparent; border: 0; border-radius: 0; overflow: visible;
+  gap: 6px;
+}
+.col.items-end .layer-btn {
+  background: transparent; border: 0; padding: 0; height: var(--ctl);
+  gap: 10px; align-items: center;
+}
+.col.items-end .layer-btn:hover:not(.active) { background: transparent; }
+.col.items-end .layer-btn.active { background: transparent; }
+
+/* Kotaknya pindah ke ikon. */
+.col.items-end .layer-btn .material-symbols-outlined {
+  width: var(--ctl); height: var(--ctl); flex: none;
+  display: grid; place-items: center;
+  background: var(--paper); color: var(--ink);
+  border: var(--bw) solid var(--ink-20); border-radius: 3px;
+  transition: background .16s, color .16s;
+}
+.col.items-end .layer-btn:hover .material-symbols-outlined { background: var(--surface-high); }
+.col.items-end .layer-btn.active .material-symbols-outlined {
+  background: var(--lime); color: var(--on-lime); border-color: var(--ink-20);
+}
+
+/* Nama parameter: putih berhalo, sebab latarnya sekarang peta bukan kertas. */
+.col.items-end .layer-btn .lb-txt {
+  color: #fff; text-shadow: 0 1px 3px rgba(0, 0, 0, .75);
+  font-weight: 300;
+}
+.col.items-end .layer-btn.active .lb-txt { color: #fff; }
+.col.items-end .lb-info {
+  background: rgba(0, 0, 0, .45); border-color: rgba(255, 255, 255, .5);
+  color: #fff; text-shadow: none;
+}
+.col.items-end .lb-info:hover { background: var(--aksen); border-color: var(--aksen); }
+
+/* Tanda seru ikut telanjang. Tidak ada bidang, tidak ada bingkai, cuma
+   hurufnya yang diberi halo supaya terbaca di atas peta. */
+.col.items-end .lb-info,
+.col.items-end .lb-info:hover {
+  background: transparent; border: 0; box-shadow: none;
+  color: rgba(255, 255, 255, .85);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, .75);
+  width: auto; height: auto; padding: 0 0 0 2px;
+  font-weight: 500;
+}
+.col.items-end .lb-info:hover { color: #fff; }
+
+/* Tanda seru pindah ke KIRI label. Tulisannya simpul teks telanjang di
+   dalam .lb-txt, bukan elemen, jadi tidak bisa diberi order. row-reverse
+   bisa, sebab teks telanjang di dalam flex tetap jadi butir flex. */
+.col.items-end .layer-btn .lb-txt { flex-direction: row-reverse; }
+
+/* ---- Identitas sidebar dibesarkan sampai memenuhi lebarnya ----
+   5 November 2026, diminta pemilik. Sebelumnya lambang 34 px dan nama
+   14 px, menyisakan ruang kosong sekitar 60 px di kanan. Tombol Tentang
+   didorong ke tepi kanan lewat margin auto supaya barisnya penuh. */
+.rt-ident .brand { width: 100%; gap: 13px; }
+.rt-ident .brand-logo { width: 44px; height: 44px; }
+.rt-ident .brand-text { flex: 1; min-width: 0; }
+.rt-ident .brand-text strong { font-size: 17px; letter-spacing: .13em; }
+.rt-ident .brand-text span { font-size: 11px; letter-spacing: .06em; }
+.rt-ident .brand-info { margin-left: auto; flex: none; }

@@ -15,14 +15,15 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet-velocity@1.7.0/dist/leaflet-velocity.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@100..900&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=block" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=r32" />
-  <link rel="stylesheet" href="rute.css?v=r32" />
+  <link rel="stylesheet" href="style.css?v=r68" />
+  <link rel="stylesheet" href="rute.css?v=r68" />
 </head>
 <body>
   <div id="stage">
     <div id="map"></div>
+    <div class="scrim scrim--bawah" aria-hidden="true"></div>
 
     <div id="ui">
       <!-- ============ TOP ============ -->
@@ -37,26 +38,17 @@
               </div>
               <button id="about-btn" class="brand-info" aria-label="Tentang aplikasi ini" title="Tentang"><span class="material-symbols-outlined">info</span></button>
             </div>
-            <a class="sibling-link" href="https://bungakertas-py.github.io/cesgs-nimbus/" title="Buka CESGS Nimbus (peta cuaca interaktif Indonesia)">
-              <span class="material-symbols-outlined pl-ico">partly_cloudy_day</span>
-              <span class="pl-txt">
-                <strong>CESGS Nimbus</strong>
-                <span>Peta cuaca interaktif Indonesia</span>
-              </span>
-              <span class="material-symbols-outlined pl-go">arrow_forward</span>
-            </a>
-          </div>
 
-          <div class="layer-bar">
-            <div class="panel layers">
-              <button class="layer-btn active" data-layer="arus" data-tip="Arus laut (kontur + partikel)">
-                <span class="material-symbols-outlined">waves</span> <span class="lb-txt">Arus<span class="lb-info" data-info="arus" role="button" tabindex="0" aria-label="Apa itu arus">!</span></span>
-              </button>
-              <button class="layer-btn" data-layer="wave" data-tip="Tinggi gelombang (segera hadir)">
-                <span class="material-symbols-outlined">water</span> <span class="lb-txt">Gelombang<span class="lb-info" data-info="wave" role="button" tabindex="0" aria-label="Apa itu gelombang">!</span></span>
-              </button>
+            <!-- Waktu data. Sengaja DI DALAM .brand-row supaya ikut terbawa
+                 waktu identitas dipindahkan ke sidebar oleh rute.js, cukup
+                 satu pemindahan simpul. -->
+            <div id="data-fresh" class="fresh-badge" title="Waktu data model">
+              <span class="material-symbols-outlined fresh-ico">error</span>
+              <span class="mono" id="fresh-text"></span>
             </div>
           </div>
+
+
         </div>
 
         <div class="col items-end">
@@ -66,17 +58,33 @@
           </div>
           <button id="share-btn" class="icon-btn" aria-label="Bagikan tampilan ini" data-tip="Bagikan"><span class="material-symbols-outlined">share</span></button>
           <button id="fs-btn" class="icon-btn" aria-label="Layar penuh" data-tip="Layar Penuh"><span class="material-symbols-outlined">fullscreen</span></button>
-          <button id="rute-btn" class="icon-btn" aria-label="Rute pelayaran" data-tip="Rute Pelayaran"><span class="material-symbols-outlined">directions_boat</span></button>
+
+          <!-- Pemilih parameter PINDAH ke kolom kanan 5 November 2026, diminta
+               pemilik. Dulu kartu bertulisan di pojok kiri atas. Sekarang ikon
+               saja, satu keluarga dengan alat peta di atasnya, dan namanya
+               muncul sebagai gelembung lewat data-tip. -->
+          <div class="panel layers">
+            <button class="layer-btn active" data-layer="arus" data-tip="Arus laut">
+              <!-- waves untuk arus, tsunami untuk gelombang. cyclone SENGAJA
+                   TIDAK DIPAKAI di sini walau bentuknya paling beda, sebab
+                   pusaran itu jatah lapisan siklon yang akan ditambahkan.
+                   Dua nama ini sudah dicek ada di daftar codepoint Material
+                   Symbols, ligature yang tidak ada tampil sebagai tulisan
+                   mentah tanpa galat apa pun. -->
+              <span class="material-symbols-outlined">waves</span>
+              <span class="lb-txt">Arus<span class="lb-info" data-info="arus" role="button" tabindex="0" aria-label="Apa itu arus">!</span></span>
+            </button>
+            <button class="layer-btn" data-layer="wave" data-tip="Tinggi gelombang">
+              <span class="material-symbols-outlined">tsunami</span>
+              <span class="lb-txt">Gelombang<span class="lb-info" data-info="wave" role="button" tabindex="0" aria-label="Apa itu gelombang">!</span></span>
+            </button>
+          </div>
         </div>
       </div>
 
       <!-- ============ BOTTOM: slider (kiri) + legenda (kanan) ============ -->
       <div class="ui-bottom">
         <div class="panel timeline">
-          <div id="data-fresh" class="fresh-badge" title="Waktu data model">
-            <span class="material-symbols-outlined fresh-ico">error</span>
-            <span class="mono" id="fresh-text"></span>
-          </div>
           <div class="tl-btns">
             <button id="play-btn" class="tl-btn" title="Play/Pause"><span class="material-symbols-outlined" id="play-icon">play_arrow</span></button>
           </div>
@@ -88,6 +96,13 @@
         </div>
 
         <div class="legend-col">
+          <!-- Kredit sumber data. WAJIB ada, bukan hiasan. Lisensi CMEMS
+               menuntut kalimat "Generated using E.U. Copernicus Marine
+               Service Information" disebut di tempat yang terlihat. -->
+          <div class="kredit">
+            Arus: Generated using E.U. Copernicus Marine Service Information. Angin dan gelombang: NOAA/NCEP GFS dan GFS-Wave (domain publik). Diolah ulang oleh CESGS.
+            <span class="kredit-alas">Peta dasar &copy; Esri, HERE, Garmin, FAO, NOAA, USGS</span>
+          </div>
           <div class="legend-panel">
             <div class="legend-head mono" id="cape-legend-head">Potensi badai · J/kg</div>
             <div class="legend" id="cape-legend-cells"></div>
@@ -133,8 +148,8 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet-velocity@1.7.0/dist/leaflet-velocity.min.js"></script>
-  <script src="app.js?v=r32"></script>
+  <script src="app.js?v=r68"></script>
   <script src="fms.js?v=r32"></script>
-  <script src="rute.js?v=r32"></script>
+  <script src="rute.js?v=r68"></script>
 </body>
 </html>

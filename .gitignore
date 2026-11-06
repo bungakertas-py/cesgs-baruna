@@ -14,6 +14,9 @@ frontend/_test.html
 
 # GRIB/NetCDF sementara
 *.nc
+# Simpanan unduhan mentah baruna_v3.py. Ratusan MB GRIB, dan isinya bisa
+# diunduh ulang kapan saja, jadi TIDAK BOLEH masuk repo.
+backend/data/raw/
 
 # Aset desain / mockup Stitch (referensi lokal, tak perlu di repo)
 Style/
