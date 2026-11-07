@@ -715,3 +715,185 @@
 #stage.bawah-tutup .rt-bawah-x .material-symbols-outlined { transform: rotate(270deg); }
 /* Aturan lama yang menambatkannya ke panel bawah dimatikan. */
 #stage.bawah-tutup .rt-bawah-x { top: auto; }
+
+/* ===================================================================
+   PANEL BAWAH SETINGGI ISINYA, 7 November 2026.
+   --rt-tl-h tidak lagi dipatok di sini. Dia diisi rute.js dari tinggi
+   yang betul betul terukur, dan dipakai menggeser bilah slider, scrim,
+   serta pembingkaian peta. Panelnya sendiri tingginya otomatis.
+   =================================================================== */
+#rt-bawah { height: auto; padding-bottom: 12px; }
+
+/* ---- Keadaan kosong: jalur telanjang dengan satu keterangan ---- */
+.rt-tl--kosong { padding: 10px 16px; }
+.rt-tl-track--kosong {
+  position: relative; height: 44px;
+  display: flex; align-items: center; justify-content: center;
+}
+.rt-tl-track--kosong .rt-tl-rail {
+  top: 50%; transform: translateY(-50%);
+  background: var(--ink-20); opacity: .55;
+}
+.rt-tl-pesan {
+  position: relative; z-index: 1;
+  padding: 0 14px; background: var(--paper);
+  font-family: var(--font-ui); font-size: 12px; font-weight: 300;
+  letter-spacing: .02em; color: var(--ink-50); white-space: nowrap;
+}
+@media (max-width: 640px) {
+  .rt-tl-pesan { white-space: normal; text-align: center; }
+}
+
+/* ===================================================================
+   ZONA BAHAYA JADI IKON, 7 November 2026.
+   Tulisannya dulu ditaruh di lajur sendiri di atas rel, dan begitu ada
+   beberapa zona berdekatan label-labelnya saling menimpa sampai tidak
+   terbaca. Sekarang cuma ikon di atas pitanya, keterangan lengkapnya
+   pindah ke baner yang muncul waktu disentuh.
+   =================================================================== */
+
+/* Lajur label dibuang, jadi reltnya bisa naik dan tracknya memendek. */
+.rt-tl-track { height: 104px; }
+.rt-tl-rail { top: 38px; }
+.rt-tl-storm { top: 32px; height: 16px; }
+.rt-tl-stop { top: 40px; }
+.rt-tl-axis { top: 80px; }
+.rt-tl-storm-lbl { display: none; }
+
+.rt-haz-ic {
+  position: absolute; left: 50%; top: -20px; transform: translateX(-50%);
+  width: 20px; height: 20px; padding: 0; cursor: pointer;
+  display: grid; place-items: center;
+  background: var(--paper); border: 1px solid currentColor;
+  border-radius: 999px; box-shadow: none;
+}
+.rt-haz-ic .material-symbols-outlined { font-size: 13px; line-height: 1; }
+.rt-tl-storm.badai .rt-haz-ic { color: #c98a00; }
+.rt-tl-storm.hujan .rt-haz-ic { color: #2f7fbf; }
+.rt-tl-storm.strong .rt-haz-ic { color: #d2691e; border-width: 1.5px; }
+.rt-haz-ic:hover, .rt-haz-ic.nempel { background: currentColor; }
+.rt-haz-ic:hover .material-symbols-outlined,
+.rt-haz-ic.nempel .material-symbols-outlined { color: #fff; }
+
+/* ---- Legenda ikon, berjejer di bawah sumbu waktu ---- */
+.rt-haz-legenda {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px 18px;
+  padding: 10px 2px 0; margin-top: 4px;
+  border-top: var(--bw) solid var(--ink-20);
+}
+.rt-haz-leg {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--font-ui); font-size: 10.5px; font-weight: 300;
+  letter-spacing: .02em; color: var(--ink-50);
+}
+.rt-haz-leg .material-symbols-outlined { font-size: 14px; }
+.rt-haz-leg.badai .material-symbols-outlined { color: #c98a00; }
+.rt-haz-leg.hujan .material-symbols-outlined { color: #2f7fbf; }
+.rt-haz-leg.kuat i {
+  width: 22px; height: 8px; border-radius: 4px; display: inline-block;
+  background: linear-gradient(90deg, rgba(255,210,26,.55), rgba(255,160,26,.95));
+}
+.rt-haz-leg.petunjuk { margin-left: auto; font-style: italic; opacity: .8; }
+
+/* ---- Baner rincian, kisi bento ---- */
+.rt-haz-baner {
+  position: absolute; bottom: calc(100% + 10px); left: 0;
+  width: 290px; padding: 14px 16px 15px; z-index: 40;
+  background: var(--paper); border: var(--bw) solid var(--ink-20);
+  border-radius: 4px; box-shadow: 0 14px 34px rgba(7, 65, 115, .18);
+  pointer-events: none;
+}
+.rt-haz-baner[hidden] { display: none; }
+.rt-haz-tag {
+  display: inline-block; font-size: 9px; font-weight: 500;
+  letter-spacing: .16em; text-transform: uppercase; color: #c98a00;
+}
+.rt-haz-baner.hujan .rt-haz-tag { color: #2f7fbf; }
+.rt-haz-baner.kuat .rt-haz-tag { color: #d2691e; }
+.rt-haz-nilai {
+  margin: 4px 0 11px;
+  font-family: var(--font-display); font-size: 21px; font-weight: 600;
+  color: var(--ink); line-height: 1.1;
+}
+.rt-haz-kisi { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--ink-20); }
+.rt-haz-kisi > div {
+  background: var(--paper); padding: 9px 10px;
+  font-family: var(--font-ui); font-size: 12px; color: var(--ink);
+}
+.rt-haz-kisi b {
+  display: block; margin-bottom: 3px;
+  font-size: 8.5px; font-weight: 400; letter-spacing: .13em;
+  text-transform: uppercase; color: var(--ink-50);
+}
+.rt-haz-lebar { grid-column: 1 / -1; }
+
+/* Penanda pelabuhan dikecilkan, 7 November 2026. Lencana dan nama yang
+   dulu menonjol sekarang tinggal seperlunya, dan bayangannya ditipiskan
+   supaya tidak menutupi garis pantai di bawahnya. */
+.rm-badge { font-size: 8px; letter-spacing: .08em; padding: 1px 5px; border-radius: 5px; box-shadow: 0 1px 3px rgba(0,0,0,.45); }
+.rm-name { font-size: 9.5px; font-weight: 500; max-width: 110px; }
+.rm-svg { filter: drop-shadow(0 1px 2px rgba(0,0,0,.5)); }
+.rm-t { line-height: 0; }
+.rm-t .rm-svg { opacity: .9; }
+.rm-t:hover .rm-svg { opacity: 1; }
+
+/* Kartu jalur dibuat berposisi supaya ikon di dalamnya punya patokan.
+   Banernya sendiri menempel ke #rt-bawah, lihat keterangan di rute.js. */
+.rt-tl { position: relative; }
+
+/* ===================================================================
+   REL BERGULIR MENDATAR, 7 November 2026.
+   Yang digulir cuma relnya. Judul jalur, tombol Taktik, dan legenda
+   tetap diam di tempat. Gulirnya dipindah ke sini dari #rt-timeline,
+   sebab di sana dia memotong baner yang menonjol ke atas.
+   =================================================================== */
+#rt-bawah #rt-timeline { overflow: visible; }
+.rt-tl-gulir {
+  overflow-x: auto; overflow-y: visible;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ink-20) transparent;
+  padding-bottom: 2px;
+}
+.rt-tl-gulir::-webkit-scrollbar { height: 7px; }
+.rt-tl-gulir::-webkit-scrollbar-thumb { background: var(--ink-20); border-radius: 4px; }
+.rt-tl-gulir::-webkit-scrollbar-track { background: transparent; }
+/* Rel tidak lagi melar mengikuti wadahnya, lebarnya ditentukan isinya. */
+.rt-tl-track { width: 100%; }
+
+/* ===================================================================
+   KARTU RINCIAN PENANDA PETA, 7 November 2026.
+   Penanda di peta sekarang ikon saja. Rinciannya muncul sebagai kartu
+   bento waktu disentuh, dan menetap waktu diklik.
+   =================================================================== */
+.hz-lbl, .rm-badge, .rm-name { display: none; }
+.hz-wrap, .rm-wrap { line-height: 0; }
+
+/* Leaflet memberi tooltip dan popup-nya sendiri latar putih, bingkai,
+   bayangan, dan padding. Semuanya dilucuti supaya yang terlihat cuma
+   kartu kita, bukan kartu di dalam kotak. */
+.leaflet-tooltip.pt-tip,
+.leaflet-popup.pt-pop .leaflet-popup-content-wrapper {
+  background: transparent; border: 0; box-shadow: none; padding: 0;
+  border-radius: 0; color: inherit;
+}
+.leaflet-tooltip.pt-tip { white-space: normal; }
+.leaflet-tooltip.pt-tip::before { display: none; }   /* panah bawaan */
+.leaflet-popup.pt-pop .leaflet-popup-content { margin: 0; width: auto !important; }
+.leaflet-popup.pt-pop .leaflet-popup-tip-container { display: none; }
+.leaflet-popup.pt-pop .leaflet-popup-close-button {
+  top: 6px; right: 6px; color: var(--ink-50); font-size: 18px; padding: 0;
+}
+.leaflet-popup.pt-pop .leaflet-popup-close-button:hover { color: var(--ink); }
+
+.pt-bento {
+  width: 258px; padding: 13px 15px 14px;
+  background: var(--paper); border: var(--bw) solid var(--ink-20);
+  border-radius: 4px; box-shadow: 0 14px 34px rgba(7, 65, 115, .24);
+  font-family: var(--font-ui);
+}
+.pt-bento .rt-haz-tag { color: #c98a00; }
+.pt-bento.hujan .rt-haz-tag { color: #2f7fbf; }
+.pt-bento.kuat .rt-haz-tag { color: #d2691e; }
+.pt-bento.pt-port .rt-haz-tag { color: var(--aksen); }
+.pt-bento .rt-haz-nilai { margin: 4px 0 10px; font-size: 19px; }
+.pt-bento.pt-port .rt-haz-nilai { font-size: 17px; }

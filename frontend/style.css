@@ -1769,3 +1769,70 @@ html, body {
 .rt-ident .brand-text strong { font-size: 17px; letter-spacing: .13em; }
 .rt-ident .brand-text span { font-size: 11px; letter-spacing: .06em; }
 .rt-ident .brand-info { margin-left: auto; flex: none; }
+
+/* ============================================================
+   GERBANG PASSCODE, 7 November 2026.
+   Petanya tetap dimuat dan tetap bergerak di belakang, cuma
+   dikaburkan. Itu disengaja, supaya orang tahu ada apa di balik
+   gerbangnya. Yang mengaburkan filter di #map, bukan lapisan
+   buram di atasnya, sebab lapisan buram ikut mengaburkan kartu
+   passcode-nya sendiri.
+   ============================================================ */
+#stage.terkunci #map { filter: blur(9px) saturate(.85); }
+#stage.terkunci #ui,
+#stage.terkunci #rute-panel,
+#stage.terkunci #rt-bawah { filter: blur(6px); pointer-events: none; }
+
+.gerbang {
+  position: absolute; inset: 0; z-index: 4000;
+  display: flex; align-items: center; justify-content: center; padding: 24px;
+  background: rgba(7, 65, 115, .34);
+  opacity: 0; transition: opacity .3s ease;
+}
+.gerbang.show { opacity: 1; }
+
+.gerbang-kartu {
+  width: min(330px, 100%);
+  display: flex; flex-direction: column; align-items: stretch; gap: 14px;
+  padding: 30px 28px 26px;
+  background: var(--paper);
+  border: var(--bw) solid var(--ink-20); border-radius: 4px;
+  box-shadow: 0 18px 50px rgba(7, 65, 115, .22);
+}
+.gerbang-logo { align-self: center; margin-bottom: 2px; }
+.gerbang-label {
+  text-align: center; font-family: var(--font-ui);
+  font-size: 11px; font-weight: 400; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--ink-50);
+}
+/* Garis bawah saja, sama dengan isian di form rute. */
+.gerbang-in {
+  width: 100%; padding: 6px 2px 7px; text-align: center;
+  background: transparent; border: 0;
+  border-bottom: 1.5px solid var(--aksen); border-radius: 0;
+  font-family: var(--font-ui); font-size: 17px; font-weight: 500;
+  letter-spacing: .22em; color: var(--ink); outline: none;
+}
+.gerbang-in:focus { border-bottom-width: 2px; }
+.gerbang-go {
+  margin-top: 2px; padding: 11px; cursor: pointer;
+  font-family: var(--font-ui); font-weight: 600; font-size: 14px;
+  color: #fff; background: var(--aksen); border: 0; border-radius: 3px;
+}
+.gerbang-go:hover { background: var(--aksen-tua, #115F86); }
+.gerbang-salah {
+  min-height: 14px; text-align: center;
+  font-family: var(--font-ui); font-size: 11px; letter-spacing: .04em;
+  color: #c0392b;
+}
+.gerbang-kartu.goyang { animation: gerbang-goyang .34s ease; }
+@keyframes gerbang-goyang {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-7px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(2px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gerbang-kartu.goyang { animation: none; }
+}

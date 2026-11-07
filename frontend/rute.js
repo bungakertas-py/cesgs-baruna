@@ -421,15 +421,29 @@
 
   /* ---- marker pelabuhan (asal/tujuan = jangkar emas, transit = kapal + badge).
      SVG sementara; ganti ke icon isometric asli kalau zip-nya sudah ada (ICON_SHIP/ICON_ANCHOR). ---- */
-  var ICON_SHIP = '<svg class="rm-svg" viewBox="0 0 64 44" width="42" height="29"><path d="M5 26h54l-7 12H12z" fill="#e05545"/><path d="M5 26h54l-2 4H7z" fill="#b93325"/><rect x="18" y="11" width="24" height="15" fill="#2d6cdf"/><rect x="18" y="11" width="24" height="3.5" fill="#4a86ff"/><rect x="22" y="5" width="11" height="7" fill="#eef2f7"/><rect x="43" y="16" width="10" height="10" fill="#5b9bf0"/></svg>';
-  var ICON_ANCHOR = '<svg class="rm-svg" viewBox="0 0 24 24" width="30" height="30"><g fill="none" stroke="#f3c13a" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4" r="2.2"/><line x1="12" y1="6.2" x2="12" y2="20.5"/><line x1="7.4" y1="10" x2="16.6" y2="10"/><path d="M4.5 13A7.5 7.5 0 0 0 12 20.5 7.5 7.5 0 0 0 19.5 13"/><path d="M4.5 13 2.8 11M19.5 13 21.2 11"/></g></svg>';
+  var ICON_SHIP = '<svg class="rm-svg" viewBox="0 0 64 44" width="22" height="15"><path d="M5 26h54l-7 12H12z" fill="#e05545"/><path d="M5 26h54l-2 4H7z" fill="#b93325"/><rect x="18" y="11" width="24" height="15" fill="#2d6cdf"/><rect x="18" y="11" width="24" height="3.5" fill="#4a86ff"/><rect x="22" y="5" width="11" height="7" fill="#eef2f7"/><rect x="43" y="16" width="10" height="10" fill="#5b9bf0"/></svg>';
+  var ICON_ANCHOR = '<svg class="rm-svg" viewBox="0 0 24 24" width="19" height="19"><g fill="none" stroke="#f3c13a" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4" r="2.2"/><line x1="12" y1="6.2" x2="12" y2="20.5"/><line x1="7.4" y1="10" x2="16.6" y2="10"/><path d="M4.5 13A7.5 7.5 0 0 0 12 20.5 7.5 7.5 0 0 0 19.5 13"/><path d="M4.5 13 2.8 11M19.5 13 21.2 11"/></g></svg>';
   function portMarker(p, kind) {
     var isT = kind === "transit";
-    var badge = isT ? '<span class="rm-badge">TRANSIT</span>'
-                    : '<span class="rm-badge rm-badge-gold">' + (kind === "asal" ? "ASAL" : "TUJUAN") + '</span>';
-    var html = '<div class="rm ' + (isT ? "rm-t" : "rm-e") + '">' + badge + '<span class="rm-name">' + p.nama + '</span>' + (isT ? ICON_SHIP : ICON_ANCHOR) + '</div>';
-    var ic = L.divIcon({ className: "rm-wrap", html: html, iconSize: [160, 58], iconAnchor: [80, isT ? 55 : 52] });
-    return L.marker(p.ll, { icon: ic, interactive: true, riseOnHover: true });
+    /* TRANSIT DIKECILKAN HABIS, 7 November 2026, diminta pemilik. Dulu tiap
+       transit membawa lencana bertulisan dan nama pelabuhan, dan di jalur
+       panjang yang transitnya belasan, penanda-penanda itu menutupi garis
+       rutenya sendiri dan pulau pulau di bawahnya. Sekarang transit cuma
+       ikon kapal kecil, namanya muncul sebagai gelembung waktu disentuh.
+       Asal dan tujuan tetap berlencana, sebab cuma ada dua dan justru itu
+       yang perlu langsung terbaca. */
+    var html = '<div class="rm ' + (isT ? "rm-t" : "rm-e") + '">' + (isT ? ICON_SHIP : ICON_ANCHOR) + '</div>';
+    var ic = isT
+      ? L.divIcon({ className: "rm-wrap", html: html, iconSize: [22, 15], iconAnchor: [11, 8] })
+      : L.divIcon({ className: "rm-wrap", html: html, iconSize: [20, 20], iconAnchor: [10, 10] });
+    var peran = kind === "asal" ? "Pelabuhan asal" : (kind === "tujuan" ? "Pelabuhan tujuan" : "Transit");
+    var kartu = '<div class="pt-bento pt-port"><span class="rt-haz-tag">' + esc(peran) + '</span>' +
+      '<div class="rt-haz-nilai">' + esc(p.nama) + '</div>' +
+      (p.tipe ? '<div class="rt-haz-kisi"><div class="rt-haz-lebar"><b>Jenis</b>' + esc(p.tipe) + '</div></div>' : '') +
+      '</div>';
+    return L.marker(p.ll, { icon: ic, interactive: true, riseOnHover: true })
+      .bindTooltip(kartu, { direction: "top", offset: [0, -8], className: "pt-tip", opacity: 1 })
+      .bindPopup(kartu, { className: "pt-pop", closeButton: true, autoPan: true, maxWidth: 280 });
   }
 
   /* ---- fenomena cuaca sepanjang jalur: potensi badai (CAPE) + hujan (mm/jam) ---- */
@@ -514,6 +528,83 @@
     }
     return { rp: rpv, maxCape: Math.round(maxCape), maxT: maxT, nStorm: nStorm, nRain: nRain, jamBadai: jamBadai };
   }
+  /* Zona bahaya jalur yang sedang tergambar. Dipakai baner rincian. */
+  var HAZ = [];
+
+  function hazBanerHtml(h) {
+    var jam = h.lewatPrakira ? "Di luar prakiraan" : jamShort(h.t);
+    var z = h.zone || {};
+    var luas = z.areaKm2 > 0
+      ? "~" + Math.round(z.areaKm2 >= 1000 ? Math.round(z.areaKm2 / 100) * 100 : Math.round(z.areaKm2 / 10) * 10).toLocaleString("id-ID") + " km\u00b2"
+      : "tidak terukur";
+    var pj = Math.round(h.spanKm || 0);
+    return '<span class="rt-haz-tag">' + esc(h.label) + (h.strong ? " kuat" : "") + '</span>' +
+      '<div class="rt-haz-nilai">' + esc(hazValStr(h)) + '</div>' +
+      '<div class="rt-haz-kisi">' +
+        '<div><b>Dilewati</b>' + esc(jam) + '</div>' +
+        '<div><b>Luas zona</b>' + luas + '</div>' +
+        '<div class="rt-haz-lebar"><b>Panjang jalur yang kena</b>' +
+          (pj >= 1 ? "~" + pj + " km" : "kurang dari 1 km") + '</div>' +
+      '</div>';
+  }
+
+  /* Baner menempel pada posisi ikonnya, lalu DIJEPIT supaya tidak keluar
+     dari panel. Tanpa penjepitan, zona di ujung kanan jalur membuat
+     banernya menggantung di luar layar dan terpotong tanpa galat. */
+  function tempatkanBaner(bn, ic, induk) {
+    bn.hidden = false;
+    var pi = induk.getBoundingClientRect(), pt = ic.getBoundingClientRect();
+    var lebar = bn.offsetWidth;
+    var x = (pt.left - pi.left) + pt.width / 2 - lebar / 2;
+    bn.style.left = Math.max(6, Math.min(x, pi.width - lebar - 6)) + "px";
+  }
+
+  function pasangHaz(el) {
+    /* Baner DITARUH DI #rt-bawah, bukan di dalam #rt-timeline. Timeline
+       punya overflow untuk gulir mendatar, dan apa pun yang menonjol ke
+       atas darinya terpotong habis tanpa galat. Ketahuan lewat pratinjau
+       berisi markup palsu, bukan lewat aplikasinya. */
+    var bawah = document.getElementById("rt-bawah");
+    if (!bawah) return;
+    var bn = bawah.querySelector(".rt-haz-baner");
+    if (!bn) {
+      bn = document.createElement("div");
+      bn.className = "rt-haz-baner";
+      bn.hidden = true;
+      bawah.appendChild(bn);
+    }
+    bn.hidden = true;
+    var nempel = null;   // ikon yang banernya sedang dipakukan
+
+    function tampil(ic) {
+      var h = HAZ[+ic.dataset.haz]; if (!h) return;
+      bn.innerHTML = hazBanerHtml(h);
+      bn.classList.toggle("kuat", !!h.strong);
+      bn.classList.toggle("hujan", h.type !== "badai");
+      tempatkanBaner(bn, ic, bawah);
+    }
+    function sembunyi() { if (!nempel) { bn.hidden = true; } }
+
+    el.addEventListener("mouseover", function (e) {
+      var ic = e.target.closest(".rt-haz-ic"); if (!ic || nempel) return;
+      tampil(ic);
+    });
+    el.addEventListener("mouseout", function (e) {
+      if (e.target.closest(".rt-haz-ic")) sembunyi();
+    });
+    el.addEventListener("click", function (e) {
+      var ic = e.target.closest(".rt-haz-ic");
+      if (!ic) { nempel = null; bn.hidden = true; nyalakan(); return; }
+      if (nempel === ic) { nempel = null; bn.hidden = true; }
+      else { nempel = ic; tampil(ic); }
+      nyalakan();
+    });
+    function nyalakan() {
+      var semua = el.querySelectorAll(".rt-haz-ic");
+      for (var i = 0; i < semua.length; i++) semua[i].classList.toggle("nempel", semua[i] === nempel);
+    }
+  }
+
   function hazValStr(h) { return h.type === "badai" ? Math.round(h.val) + " J/kg" : h.val.toFixed(1) + " mm/jam"; }
   function hazSizeStr(h) {   // ukuran zona SPASIAL asli: luas area + panjang jalur yang kena
     var pj = Math.round(h.spanKm || 0), z = h.zone, s = "";
@@ -524,18 +615,39 @@
     if (pj >= 10) s += (s ? " · " : "") + "lewat ~" + pj + " km";
     return s || "zona kecil";
   }
+  /* Kartu rincian untuk penanda DI PETA. Bentuknya sama dengan baner di
+     garis waktu, cuma sumber waktunya beda: yang di peta memakai h.waktu
+     yang sudah berupa tulisan, yang di garis waktu memakai h.t. */
+  function hazBentoPeta(h) {
+    var z = h.zone || {};
+    var luas = z.areaKm2 > 0
+      ? "~" + Math.round(z.areaKm2 >= 1000 ? Math.round(z.areaKm2 / 100) * 100 : Math.round(z.areaKm2 / 10) * 10).toLocaleString("id-ID") + " km\u00b2"
+      : "tidak terukur";
+    var pj = Math.round(h.spanKm || 0);
+    return '<div class="pt-bento' + (h.strong ? " kuat" : "") + (h.type === "badai" ? "" : " hujan") + '">' +
+      '<span class="rt-haz-tag">' + esc(h.label) + (h.strong ? " kuat" : "") + '</span>' +
+      '<div class="rt-haz-nilai">' + esc(hazValStr(h)) + '</div>' +
+      '<div class="rt-haz-kisi">' +
+        '<div><b>Dilewati</b>' + esc(h.lewatPrakira ? "Di luar prakiraan" : h.waktu) + '</div>' +
+        '<div><b>Luas zona</b>' + luas + '</div>' +
+        '<div class="rt-haz-lebar"><b>Panjang jalur yang kena</b>' +
+          (pj >= 1 ? "~" + pj + " km" : "kurang dari 1 km") + '</div>' +
+      '</div></div>';
+  }
+
   function hazMarker(h) {
-    var isB = h.type === "badai";
-    var svg = isB ? ICON_BADAI(h.strong) : ICON_HUJAN(h.strong);
-    var jam = h.lewatPrakira ? "di luar jangkauan prakiraan" : ("~" + h.waktu);
-    var html = '<div class="hz hz-' + h.type + (h.strong ? " hz-strong" : "") + '">' + svg +
-               '<span class="hz-lbl">' + h.label + '<b>' + hazValStr(h) + '</b>' +
-               '<em class="hz-meta">' + jam + ' · ' + hazSizeStr(h) + '</em></span></div>';
-    var ic = L.divIcon({ className: "hz-wrap", html: html, iconSize: [150, 60], iconAnchor: [17, 54] });
-    var tip = h.label + " " + hazValStr(h) + "<br>Perkiraan tiba " + (h.lewatPrakira ? "di luar prakiraan" : h.waktu) +
-              "<br>Zona " + hazSizeStr(h);
+    /* IKON SAJA, 7 November 2026, diminta pemilik. Dulu tiap zona membawa
+       nama, angka, jam, dan luasnya langsung di peta, dan begitu ada
+       beberapa zona berdekatan tulisannya saling menimpa sampai pulau di
+       bawahnya ikut tertutup. Rinciannya pindah ke kartu yang muncul waktu
+       disentuh, dan menetap waktu diklik. */
+    var svg = h.type === "badai" ? ICON_BADAI(h.strong) : ICON_HUJAN(h.strong);
+    var html = '<div class="hz hz-' + h.type + (h.strong ? " hz-strong" : "") + '">' + svg + '</div>';
+    var ic = L.divIcon({ className: "hz-wrap", html: html, iconSize: [26, 26], iconAnchor: [13, 13] });
+    var kartu = hazBentoPeta(h);
     return L.marker(h.ll, { icon: ic, interactive: true, riseOnHover: true })
-      .bindTooltip(tip, { direction: "top", sticky: true });
+      .bindTooltip(kartu, { direction: "top", offset: [0, -10], className: "pt-tip", opacity: 1 })
+      .bindPopup(kartu, { className: "pt-pop", closeButton: true, autoPan: true, maxWidth: 300 });
   }
 
   /* ---- peta ---- */
@@ -599,14 +711,35 @@
         '<div class="rt-tl-dot"></div>' +
         '<div class="rt-tl-stoplbl ' + pos + '"><b>' + esc(s.nama) + '</b><i>' + jamShort(eta(s.idx)) + '</i></div></div>';
     }).join("");
-    var storms = (best.hazards || []).slice().sort(function (a, b) { return a.t - b.t; }).map(function (h) {
+    /* Zona bahaya digambar sebagai IKON, bukan tulisan. Tulisannya dulu
+       ditaruh di lajur sendiri di atas rel, dan begitu ada beberapa zona
+       berdekatan label-labelnya saling menimpa sampai tidak terbaca.
+       Keterangan lengkapnya pindah ke baner yang muncul waktu ikonnya
+       disentuh. */
+    HAZ = (best.hazards || []).slice().sort(function (a, b) { return a.t - b.t; });
+    var storms = HAZ.map(function (h, i) {
       var xa = X(eta(h.i0)), xb = X(eta(h.i1)), w = Math.max(xb - xa, 1.4);
-      var jam = h.lewatPrakira ? "di luar prakiraan" : jamShort(h.t);
-      return '<div class="rt-tl-storm ' + (h.type === "badai" ? "badai" : "hujan") + (h.strong ? " strong" : "") +
-        '" style="left:' + xa.toFixed(2) + '%;width:' + w.toFixed(2) + '%" title="' +
-        esc(h.label + " " + hazValStr(h) + " · " + jam + " · " + hazSizeStr(h)) + '">' +
-        '<span class="rt-tl-storm-lbl"><b>' + esc(h.label) + '</b>' + esc(hazValStr(h)) + ' · ' + jam + '</span></div>';
+      var jenis = h.type === "badai" ? "badai" : "hujan";
+      var ikon = h.type === "badai" ? "bolt" : "rainy";
+      return '<div class="rt-tl-storm ' + jenis + (h.strong ? " strong" : "") +
+        '" style="left:' + xa.toFixed(2) + '%;width:' + w.toFixed(2) + '%">' +
+        '<button type="button" class="rt-haz-ic" data-haz="' + i + '" ' +
+          'aria-label="' + esc(h.label) + '">' +
+          '<span class="material-symbols-outlined">' + ikon + '</span></button></div>';
     }).join("");
+
+    /* Legenda ikon, berjejer di bawah sumbu waktu. Cuma jenis yang betul
+       betul ada di jalur ini yang ditampilkan, supaya tidak ada baris mati. */
+    var jenisAda = {};
+    HAZ.forEach(function (h) { jenisAda[h.type === "badai" ? "badai" : "hujan"] = true; });
+    var legenda = "";
+    if (HAZ.length) {
+      legenda = '<div class="rt-haz-legenda">' +
+        (jenisAda.badai ? '<span class="rt-haz-leg badai"><span class="material-symbols-outlined">bolt</span>Potensi badai</span>' : '') +
+        (jenisAda.hujan ? '<span class="rt-haz-leg hujan"><span class="material-symbols-outlined">rainy</span>Hujan</span>' : '') +
+        '<span class="rt-haz-leg kuat"><i></i>Warna pekat berarti lebih kuat</span>' +
+        '</div>';
+    }
     var N = 5, ticks = "";
     for (var i = 0; i <= N; i++) { var tt = t0 + span * i / N; ticks += '<div class="rt-tl-tick" style="left:' + (2 + 96 * i / N).toFixed(2) + '%"><span>' + jamShort(tt) + '</span></div>'; }
     var tiba = best.tiba > WX.lastT + 1 ? "di luar prakiraan" : jamShort(best.tiba);
@@ -616,8 +749,19 @@
         '<span class="rt-tl-sub">' + nmTot.toFixed(0) + ' nm · ' + timing.speed.toFixed(1) + ' kn · tiba ' + tiba + '</span>' +
         '<div class="rt-tl-rec"><span class="rt-tl-reclbl">Rekomendasi ' + esc(best.st.label) + ' · ' + rp(best.rp_total) + '</span>' +
         '<button type="button" id="rt-open-cards" class="rt-tl-open"><span class="material-symbols-outlined">dashboard</span> Taktik & biaya</button></div></div>' +
-      '<div class="rt-tl-track"><div class="rt-tl-rail"></div>' + storms + stops +
-        '<div class="rt-tl-axis">' + ticks + '</div></div></div>';
+      /* Relnya dibungkus wadah bergulir SENDIRI, bukan seluruh kartu.
+         Kalau kartunya yang dilebarkan, judul jalur dan tombol Taktik ikut
+         terdorong jauh ke kanan dan hilang dari layar.
+
+         Lebar minimumnya dihitung dari jumlah perhentian, 128 px per
+         perhentian. Di bawah itu nama pelabuhan mulai saling menimpa, dan
+         jalur panjang bertransit belasan memang sudah pasti perlu digulir. */
+      '<div class="rt-tl-gulir"><div class="rt-tl-track" style="min-width:' +
+        Math.max(100, sp.length * 128) + 'px">' +
+        '<div class="rt-tl-rail"></div>' + storms + stops +
+        '<div class="rt-tl-axis">' + ticks + '</div></div></div>' + legenda + '</div>';
+    pasangHaz(el);
+    requestAnimationFrame(ukurBawah);
   }
 
   /* Sudah cukup untuk dihitung? Dipakai supaya database pelabuhan yang baru
@@ -626,25 +770,38 @@
     return !!(portByIdN(comboPort(asalCombo())) && portByIdN(comboPort(tujuanCombo())));
   }
 
-  /* Petunjuk di panel bawah selama belum ada yang dihitung. Dia menempati
-     ruang yang nanti dipakai garis waktu pelayaran, jadi orang tahu ruang itu
-     untuk apa, bukan sekadar kosong. */
+  /* Keadaan kosong. Dulu di sini ada petunjuk tiga langkah, dan dia memakan
+     tinggi tiga kali lipat isi sebenarnya. Diganti jalur kosong yang bentuknya
+     sama persis dengan jalur betulan, jadi orang langsung melihat ruang itu
+     untuk apa tanpa perlu dijelaskan. */
   function petunjukAwal() {
-    return '<div class="rt-mulai">' +
-      '<div class="rt-mulai-kiri">' +
-        '<span class="rt-mulai-tag">Belum ada jalur</span>' +
-        '<h3 class="rt-mulai-judul">Rencanakan pelayaranmu</h3>' +
-        '<p class="rt-mulai-teks">Di sini nanti muncul garis waktu pelayaranmu, mulai jam berangkat sampai jam tiba, cuaca yang dilewati di tiap penggal jalur, dan perkiraan biayanya.</p>' +
-      '</div>' +
-      '<ol class="rt-langkah">' +
-        '<li><span class="rt-no">1</span><div><strong>Pilih asal dan tujuan</strong>Ketik nama pelabuhan di panel kanan, lalu pilih dari daftar yang muncul.</div></li>' +
-        '<li><span class="rt-no">2</span><div><strong>Pilih jenis kapal</strong>Angka teknisnya terisi sendiri, dan semuanya boleh kamu ubah.</div></li>' +
-        '<li><span class="rt-no">3</span><div><strong>Tekan Hitung rute</strong>Jalurnya dirangkai dari jaringan laut yang betul betul dilayari.</div></li>' +
-      '</ol></div>';
+    return '<div class="rt-tl rt-tl--kosong">' +
+      '<div class="rt-tl-track rt-tl-track--kosong">' +
+        '<div class="rt-tl-rail"></div>' +
+        '<span class="rt-tl-pesan">Masukkan asal dan tujuan di panel kanan</span>' +
+      '</div></div>';
+  }
+
+  /* Tinggi panel bawah DIUKUR dari isinya, tidak dipatok angka.
+
+     Dulu --rt-tl-h dipatok 262 px, dan angka itu harus muat untuk isi
+     paling tinggi, jadi keadaan kosong ikut setinggi itu walau isinya
+     sepersepuluhnya. Sekarang CSS memakai tinggi otomatis, lalu angkanya
+     dibaca balik ke --rt-tl-h untuk menggeser bilah slider, scrim, dan
+     pembingkaian peta. */
+  function ukurBawah() {
+    var bw = document.getElementById("rt-bawah");
+    var st = document.getElementById("stage");
+    if (!bw || !st) return;
+    var h = Math.round(bw.getBoundingClientRect().height);
+    if (h > 0) st.style.setProperty("--rt-tl-h", h + "px");
+    setInset(panelCoverPx());
+    if (window.BARUNA_reframe) window.BARUNA_reframe();
   }
 
   function tlMsg(html) {   // pesan/peringatan tampil di area timeline (kelihatan), kosongkan modal kartu
     var el = document.getElementById("rt-timeline"); if (el) el.innerHTML = html;
+    requestAnimationFrame(ukurBawah);
     var c = document.getElementById("rt-cards"); if (c) c.innerHTML = "";
     closeCards();
   }
@@ -956,6 +1113,15 @@
     bawah.innerHTML = '<div id="rt-timeline"></div>';
     document.getElementById("stage").appendChild(bawah);
 
+    /* Tombol Taktik dan biaya ikut pindah ke panel bawah waktu panel rute
+       dibelah 5 November 2026, sedangkan pendengar kliknya tertinggal di
+       sidebar. Akibatnya tombolnya tergambar rapi tapi diketuk tidak terjadi
+       apa apa, tanpa galat di konsol sama sekali. Pendengarnya dipasang di
+       wadah barunya. */
+    bawah.addEventListener("click", function (e) {
+      if (e.target.closest("#rt-open-cards")) openCards();
+    });
+
     /* Tombolnya menempel di TEPI KIRI SIDEBAR, bukan di panel bawah.
        Diminta pemilik 5 November 2026. Ditaruh di sidebar sebab sidebar
        itu permanen, jadi tombolnya tidak ikut bergerak waktu panel bawah
@@ -1084,6 +1250,7 @@
     if (window.BARUNA_reframe) window.BARUNA_reframe();
   }
   window.addEventListener("resize", function () {
+    ukurBawah();
     if (!aktif) return;
     setInset(panelCoverPx()); if (window.BARUNA_reframe) window.BARUNA_reframe();
   });
