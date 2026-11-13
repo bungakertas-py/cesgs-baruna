@@ -11,10 +11,13 @@ const toWIB = (iso) => new Date(new Date(iso).getTime() + 7 * 3600e3);
 const nlng = (l) => ((l % 360) + 360) % 360;
 
 /* Legenda per parameter (angka, warna, teks-gelap?) */
-const SPEED_CELLS = [["0", "#008000", 1], ["0.25", "#005020", 1], ["0.5", "#002040", 1], ["0.75", "#001060", 1],
-  ["1", "#004080", 1], ["1.5", "#42a0c0", 1], ["2", "#ffffff", 0]];
-const WAVE_CELLS = [["0", "#10204a", 1], ["1", "#1d5c91", 1], ["2", "#1e9c8a", 1],
-  ["3", "#95cc5b", 0], ["4", "#ecc317", 0], ["5", "#ef780d", 1]];
+/* HARUS sama persis dengan HENTI_ARUS dan HENTI_WAVE di backend/pipeline/
+   baruna_v3.py. Kalau beda, angka di legenda berbohong soal warna di peta
+   dan tidak ada yang memberi tahu. Angka ketiga = huruf putih atau tidak. */
+const SPEED_CELLS = [["0", "#06243D", 1], ["0.25", "#0B3E63", 1], ["0.5", "#11598C", 1],
+  ["0.75", "#1679AB", 1], ["1", "#3FA3CF", 1], ["1.5", "#8FD4EC", 0], ["2", "#FFFFFF", 0]];
+const WAVE_CELLS = [["0", "#0A2545", 1], ["1", "#124C78", 1], ["2", "#1679AB", 1],
+  ["3", "#5BB7D8", 0], ["4", "#E8B23C", 0], ["5", "#E06C1F", 1]];
 const CAPE_CELLS = [["1000", "#fcab8f", 0], ["1800", "#fb7252", 0],
   ["2600", "#e83429", 1], ["3400", "#b31218", 1], ["4200", "#67000d", 1]];
 const LEGEND = {

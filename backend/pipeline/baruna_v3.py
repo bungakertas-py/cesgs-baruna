@@ -309,14 +309,21 @@ def simpan(rgba, path, mutu=82):
 #  Titik henti legenda. HARUS sama dengan LEGEND di frontend/app.js, kalau
 #  tidak, angka di legenda berbohong soal warna di peta.
 # ==========================================================================
-HENTI_ARUS = [(0, "#008000"), (0.25, "#005020"), (0.5, "#002040"), (0.75, "#001060"),
-              (1, "#004080"), (1.5, "#42a0c0"), (2, "#ffffff")]
-HENTI_WAVE = [(0, "#10204a"), (1, "#1d5c91"), (2, "#1e9c8a"),
-              (3, "#95cc5b"), (4, "#ecc317"), (5, "#ef780d")]
+# Satu rona biru CESGS, 7 November 2026, diminta pemilik. Hijau dibuang
+# seluruhnya. Urutannya GELAP DI PELAN, TERANG DI KENCANG, bukan
+# sebaliknya: alas petanya gelap, jadi laut yang tenang menyatu dengan
+# latar dan yang menonjol cuma arus kuat. Kalau dibalik, seluruh samudra
+# jadi pucat dan tidak ada yang terbaca.
+HENTI_ARUS = [(0, "#06243D"), (0.25, "#0B3E63"), (0.5, "#11598C"),
+              (0.75, "#1679AB"), (1, "#3FA3CF"), (1.5, "#8FD4EC"), (2, "#FFFFFF")]
+# Gelombang: biru untuk yang aman, hangat untuk yang berbahaya. Hijau dan
+# teal yang dulu ada di tengah dibuang.
+HENTI_WAVE = [(0, "#0A2545"), (1, "#124C78"), (2, "#1679AB"),
+              (3, "#5BB7D8"), (4, "#E8B23C"), (5, "#E06C1F")]
 HENTI_CAPE = [(1000, "#fcab8f"), (1800, "#fb7252"), (2600, "#e83429"),
               (3400, "#b31218"), (4200, "#67000d")]
-HENTI_ANGIN = [(0, "#0b2a4a"), (5, "#1d5c91"), (10, "#2dd4bf"),
-               (15, "#ffe14d"), (20, "#ff8c1a"), (25, "#ff2d2d")]
+HENTI_ANGIN = [(0, "#071F36"), (5, "#0E4A72"), (10, "#1679AB"),
+               (15, "#5BB7D8"), (20, "#E8B23C"), (25, "#E06C1F")]
 
 META = {
     "cape":  dict(label="Potensi badai", units="J/kg", kind="scalar", source="GFS CAPE",
@@ -327,10 +334,10 @@ META = {
                   colors=["#8ad8ff", "#ffffff", "#ffd166", "#ff7b00"]),
     "arus":  dict(label="Arus Laut", units="m/s", kind="vector", source="CMEMS (Copernicus)",
                   velScale=0.12, maxVel=2,
-                  colors=["#a5f3ea", "#2dd4bf", "#0d9488"]),
+                  colors=["#8FD4EC", "#3FA3CF", "#FFFFFF"]),
     "wave":  dict(label="Tinggi Gelombang", units="m", kind="vector", source="GFS-Wave (NOAA)",
                   velScale=0.03, maxVel=6,
-                  colors=["#bcd9ff", "#5b9bd5", "#ffffff"]),
+                  colors=["#8FD4EC", "#3FA3CF", "#FFFFFF"]),
 }
 BATAS = {"lonW": LON_W, "lonE": LON_E, "latS": LAT_S, "latN": LAT_N}
 

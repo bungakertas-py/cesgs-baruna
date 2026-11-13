@@ -88,14 +88,14 @@
 .badge.rt-bad { background: rgba(255,107,107,.16); color: var(--error); border-color: rgba(255,107,107,.4); }
 .badge.rt-ok  { background: rgba(150,152,255,.14); color: var(--primary); border-color: rgba(150,152,255,.3); }
 
-/* Spanduk Tertahan */
-.rute-tertahan {
+/* Spanduk pesan, dipakai peringatan umum seperti rute tidak ketemu */
+.rute-pesan {
   display: flex; gap: 10px; align-items: flex-start;
   background: rgba(255,107,107,.12); border: 1px solid rgba(255,107,107,.4);
   border-radius: var(--r-card); padding: 12px 14px; font-size: 12px; line-height: 1.45; color: var(--ink);
 }
-.rute-tertahan .material-symbols-outlined { color: var(--error); flex: none; font-size: 22px; }
-.rute-tertahan strong { display: block; font-family: var(--font-ui); font-size: 13.5px; margin-bottom: 3px; }
+.rute-pesan .material-symbols-outlined { color: var(--error); flex: none; font-size: 22px; }
+.rute-pesan strong { display: block; font-family: var(--font-ui); font-size: 13.5px; margin-bottom: 3px; }
 
 /* Label pelabuhan di peta */
 .leaflet-tooltip.rute-port {
@@ -897,3 +897,15 @@
 .pt-bento.pt-port .rt-haz-tag { color: var(--aksen); }
 .pt-bento .rt-haz-nilai { margin: 4px 0 10px; font-size: 19px; }
 .pt-bento.pt-port .rt-haz-nilai { font-size: 17px; }
+
+/* ===================================================================
+   HIJAU DIBUANG DARI SELURUH CHROME, 7 November 2026.
+   Palet jadi satu rona biru CESGS: #1679AB aksen, #074173 tinta.
+   =================================================================== */
+.rt-tl-rail { background: linear-gradient(90deg, #1679AB, #5BB7D8); }
+.rt-tl-reclbl { color: var(--aksen); }
+.badge.rt-rec {
+  background: rgba(22, 121, 171, .14); color: var(--aksen);
+  border-color: rgba(22, 121, 171, .4);
+}
+.rc-haz-clear .material-symbols-outlined { color: var(--aksen); }

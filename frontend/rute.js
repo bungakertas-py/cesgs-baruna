@@ -1,9 +1,15 @@
 /* ===================================================================
-   rute.js  Mode "Rute & Dampak Pelayaran" untuk CESGS Baruna (MVP)
-   "Google Maps buat kapal". Pilih pelabuhan asal dan tujuan plus profil
-   kapal, lalu muncul kartu tiap jalur dengan biaya total (dasar plus
-   rugi cuaca). Jalur aman termurah dapat cap Rekomendasi. Kalau semua
-   tak aman, status Tertahan.
+   rute.js  Mode Rute dan Dampak Pelayaran untuk CESGS Baruna.
+
+   LINGKUP DIPERSEMPIT 13 November 2026. Pilih pelabuhan asal dan tujuan
+   plus profil kapal penumpang, lalu muncul SATU angka: tambahan biaya
+   BBM akibat cuaca di sepanjang jalur.
+
+   Yang sengaja dibuang dan jangan dihidupkan lagi tanpa aba aba:
+   banding strategi dan kartu Taktik, keterlambatan, keadaan Tertahan,
+   biaya sewa, dan pencapan Rekomendasi. Zona bahaya dan ambang
+   keselamatan tetap dipindai tapi cuma jadi NOTIFIKASI di peta, tanpa
+   angka rupiah.
 
    Jalur = A* di atas mask darat-laut (ujung pas di pelabuhan, ga nembus darat).
    Cuaca ASLI disampel di sepanjang jalur: ombak GFS-Wave, angin GFS, arus CMEMS
@@ -54,17 +60,14 @@
   function portById(id) { for (var i=0;i<PORTS.length;i++) if (PORTS[i].id===id) return PORTS[i]; return PORTS[0]; }
 
   /* ---- jenis kapal + nilai bawaan (taksiran kelas, boleh diedit) ---- */
+  /* PELAYARAN PENUMPANG SAJA, 13 November 2026, lingkup dipersempit.
+     Kargo, peti kemas, tanker, curah, tongkang, tunda, dan ikan dibuang
+     dari purwarupa. Angkanya masih tersimpan di riwayat git kalau suatu
+     saat lingkupnya dilebarkan lagi. */
   var JENIS = [
-    { id:"feri",     nama:"Feri Ro-Pax (penyeberangan)", L_BWL:85,  B:15.6, T:3.8,  C_B:0.60, V0:12, FOC0:8,   SFOC:190, eta_D:0.60, A_T:200, C_X:0.8,  amb:{hs:2.5,angin:21} },
-    { id:"penumpang",nama:"Kapal Penumpang (Pelni)",     L_BWL:140, B:23.0, T:6.0,  C_B:0.60, V0:18, FOC0:45,  SFOC:185, eta_D:0.64, A_T:700, C_X:0.9,  amb:{hs:2.5,angin:21} },
-    { id:"kargo",    nama:"Kargo Umum",                  L_BWL:100, B:18.0, T:5.5,  C_B:0.75, V0:12, FOC0:22,  SFOC:185, eta_D:0.62, A_T:250, C_X:0.8,  amb:{hs:4.0,angin:27} },
-    { id:"petikemas",nama:"Peti Kemas (feeder)",         L_BWL:140, B:23.0, T:8.0,  C_B:0.65, V0:16, FOC0:40,  SFOC:180, eta_D:0.65, A_T:500, C_X:0.9,  amb:{hs:4.0,angin:27} },
-    { id:"tanker",   nama:"Tanker",                      L_BWL:160, B:27.0, T:10.0, C_B:0.80, V0:13, FOC0:35,  SFOC:180, eta_D:0.64, A_T:350, C_X:0.85, amb:{hs:4.0,angin:27} },
-    { id:"curah",    nama:"Kapal Curah (bulk)",          L_BWL:170, B:27.0, T:10.0, C_B:0.82, V0:13, FOC0:32,  SFOC:180, eta_D:0.63, A_T:320, C_X:0.85, amb:{hs:4.0,angin:27} },
-    { id:"tongkang", nama:"Tongkang (ditarik tunda)",    L_BWL:90,  B:24.0, T:4.0,  C_B:0.90, V0:6,  FOC0:6,   SFOC:200, eta_D:0.55, A_T:150, C_X:1.0,  amb:{hs:1.5,angin:16} },
-    { id:"tunda",    nama:"Kapal Tunda (tugboat)",       L_BWL:28,  B:9.0,  T:4.0,  C_B:0.58, V0:11, FOC0:5,   SFOC:200, eta_D:0.50, A_T:60,  C_X:0.9,  amb:{hs:1.5,angin:16} },
-    { id:"ikan",     nama:"Kapal Ikan",                  L_BWL:25,  B:6.0,  T:2.5,  C_B:0.55, V0:9,  FOC0:1.2, SFOC:210, eta_D:0.52, A_T:40,  C_X:0.8,  amb:{hs:1.25,angin:15} },
-    { id:"lain",     nama:"Lainnya (isi manual)",        L_BWL:100, B:18.0, T:5.0,  C_B:0.70, V0:12, FOC0:15,  SFOC:190, eta_D:0.60, A_T:250, C_X:0.85, amb:{hs:2.5,angin:21} }
+    { id:"feri",     nama:"Feri Ro-Pax (penyeberangan)", L_BWL:85,  B:15.6, T:3.8, C_B:0.60, V0:12, FOC0:8,  SFOC:190, eta_D:0.60, A_T:200, C_X:0.8, amb:{hs:2.5,angin:21} },
+    { id:"penumpang",nama:"Kapal Penumpang (Pelni)",     L_BWL:140, B:23.0, T:6.0, C_B:0.60, V0:18, FOC0:45, SFOC:185, eta_D:0.64, A_T:700, C_X:0.9, amb:{hs:2.5,angin:21} },
+    { id:"lain",     nama:"Kapal penumpang lain (isi manual)", L_BWL:100, B:18.0, T:5.0, C_B:0.70, V0:12, FOC0:15, SFOC:190, eta_D:0.60, A_T:250, C_X:0.85, amb:{hs:2.5,angin:21} }
   ];
   function jenisById(id) { for (var i=0;i<JENIS.length;i++) if (JENIS[i].id===id) return JENIS[i]; return JENIS[0]; }
 
@@ -289,61 +292,28 @@
     });
     return out;
   }
-  function evalStrategy(route, kapal, harga, eta, st) {
-    var titik = route._titik, kap = {}; for (var kk in kapal) kap[kk] = kapal[kk];
-    kap.V0 = st.speed;
-    kap.FOC0 = kapal.FOC0 * Math.pow(st.speed / (kapal.V0 || st.speed), 3);   // laju BBM ~ pangkat tiga kecepatan
-    var f = FMS.hitungRute(kap, titik, eta, harga);
-    var bbm_ton = f.over_bunker_ton + kap.FOC0 * f.jam_acuan / 24;     // BBM nyata di kecepatan ini
-    var rp_bbm = bbm_ton * harga.bunker * harga.kurs;
-    var rp_sewa = f.jam * (harga.sewa / 24) * harga.kurs;
-    var rp_tunda = (st.dwellH || 0) * (harga.sewa / 24) * harga.kurs;
-    var rp_operasi = rp_bbm + rp_sewa + rp_tunda;
-    var timing = { speed: st.speed, dwellH: st.dwellH, dwellNm: st.dwellNm };
-    var risk = exposureRisk(route, timing, harga), hz = scanHazards(route, timing);
-    var tiba = etaFn(route, timing)(route.wp.length - 1);
-    return { st: st, f: f, bbm_ton: bbm_ton, rp_bbm: rp_bbm, rp_sewa: rp_sewa, rp_tunda: rp_tunda,
-             rp_operasi: rp_operasi, risk: risk, rp_total: rp_operasi + risk.rp, hazards: hz,
-             jam_total: f.jam + (st.dwellH || 0), tiba: tiba };
-  }
-  function buildStrategies(route, kapal, ambang, eta, harga) {
+  /* ---- SATU PENILAIAN, bukan banding strategi ----
+     Lingkup dipersempit 13 November 2026: feri penumpang MENJAGA JADWAL,
+     jadi tidak ada pilihan kecepatan, penundaan, maupun singgah lebih lama
+     untuk dibandingkan. Yang dihitung cuma satu, tambahan biaya BBM pada
+     kecepatan dinas.
+
+     evalStrategy dan buildStrategies yang lama DIBUANG bersama seluruh
+     percabangan biayanya: keterlambatan, keadaan tertahan, biaya sewa, dan
+     risiko badai yang dirupiahkan. Zona bahaya tetap dipindai, tapi cuma
+     untuk ditampilkan sebagai notifikasi. */
+  function evalPelayaran(route, kapal, ambang, harga) {
     cumNm(route);
     var sp = siapkan(route, ambang);
     route._sp = sp; route._titik = sp.titik;
-    var V0 = kapal.V0 > 0 ? kapal.V0 : 12, cands = [];
-    function add(label, kind, speed, dwellH, dwellNm, pel) {
-      cands.push({ label: label, kind: kind, speed: +(speed).toFixed(1), dwellH: dwellH || 0, dwellNm: dwellNm || 0, pel: pel || "" });
-    }
-    add("Jalan normal " + V0.toFixed(0) + " kn", "normal", V0, 0, 0);
-    [0.85, 0.7, 0.6].forEach(function (fac) { var s = V0 * fac; if (s >= 5) add("Kurangi kecepatan ke " + s.toFixed(1) + " kn", "slow", s, 0, 0); });
-    if (V0 * 1.1 <= 25) add("Tambah kecepatan ke " + (V0*1.1).toFixed(1) + " kn", "fast", V0 * 1.1, 0, 0);
-    [6, 12, 18, 24].forEach(function (h) { add("Tunda berangkat " + h + " jam", "delay", V0, h, 0); });
-    // transit lebih lama: cari badai pertama, lalu pelabuhan singgah terakhir SEBELUM badai itu
-    var hz0 = scanHazards(route, { speed: V0 }), badai0 = hz0.filter(function (z) { return z.type === "badai"; })
-      .sort(function (a, b) { return a.t - b.t; })[0];
-    if (badai0) {
-      var c = cumNm(route), hazNm = c[badai0.i0], pos = stopPositions(route);
-      var cand = null;
-      pos.forEach(function (ps, k) { if (k > 0 && k < pos.length - 1 && ps.nm < hazNm - 5 && ps.nm > 0) cand = ps; });
-      if (cand) [6, 12, 18].forEach(function (h) { add("Singgah " + h + " jam lebih lama di " + cand.nama, "dwell", V0, h, cand.nm, cand.nama); });
-    }
-    var evald = cands.map(function (st) { return evalStrategy(route, kapal, harga, eta, st); });
-    evald.sort(function (a, b) { return a.rp_total - b.rp_total; });
-    var maxRisk = Math.max.apply(null, evald.map(function (e) { return e.risk.rp; }));
-    var normal = evald.filter(function (e) { return e.st.kind === "normal"; })[0];
-    var best = evald[0];
-    // rekomendasi = yang termurah, TAPI kalau hemat vs normal cuma tipis (<2%) ambil normal saja
-    var rec = (best !== normal && (normal.rp_total - best.rp_total) < normal.rp_total * 0.02) ? normal : best;
-    evald.forEach(function (e) { e.rekomendasi = (e === rec); });
-    var display;
-    if (!badai0 || maxRisk < normal.rp_operasi * 0.01) { display = [normal]; }
-    else {
-      display = [rec];
-      if (normal !== rec) display.push(normal);
-      if (best !== rec && best !== normal) display.push(best);
-      evald.forEach(function (e) { if (display.length < 5 && display.indexOf(e) < 0) display.push(e); });
-    }
-    return { list: display, semua: evald, best: rec, badaAda: !!badai0 };
+    var V0 = kapal.V0 > 0 ? kapal.V0 : 12;
+    var timing = { speed: V0, dwellH: 0, dwellNm: 0 };
+    var f = FMS.hitungRute(kapal, sp.titik, harga);
+    return {
+      st: timing, f: f,
+      hazards: scanHazards(route, timing),
+      tiba: etaFn(route, timing)(route.wp.length - 1)
+    };
   }
 
   /* ---- format ---- */
@@ -353,74 +323,9 @@
     if (Math.abs(v) >= 1e6) return "Rp " + (v/1e6).toFixed(1) + " jt";
     return "Rp " + v.toLocaleString("id-ID");
   }
-  function jamStr(j) { return j >= 24 ? j.toFixed(0) + " jam (" + (j/24).toFixed(1) + " hari)" : j.toFixed(1) + " jam"; }
 
-  var KIND_ICON = { normal: "sailing", slow: "slow_motion_video", fast: "speed", delay: "schedule", dwell: "anchor" };
-  function kartuHtml(e, base) {
-    var st = e.st, cls = "rute-card" + (e.rekomendasi ? " rec" : "");
-    var badge = e.rekomendasi ? '<span class="badge rt-rec">Rekomendasi</span>'
-              : '<span class="badge rt-ok">Alternatif</span>';
-    var ic = KIND_ICON[st.kind] || "sailing";
-    var badaiMax = e.risk.maxCape >= HZ.badai.lo
-        ? (e.risk.maxCape + " J/kg · " + e.risk.nStorm + " titik")
-        : "aman";
-    // penjelasan
-    var stat;
-    if (st.kind === "normal") {
-      stat = e.risk.rp < 1000 ? "Cuaca aman sepanjang jalur. Jalan normal saja."
-           : e.rekomendasi ? "Ada badai di jalur, tapi ubah kecepatan atau jadwal cuma hemat sedikit. Jalan normal sambil tetap waspada."
-           : "Lewat zona badai tanpa ubah jadwal. Ini patokan risiko tertinggi.";
-    } else {
-      var dRisk = (base ? base.risk.rp : 0) - e.risk.rp, dCost = e.rp_operasi - (base ? base.rp_operasi : 0);
-      var net = dRisk - dCost;
-      var aksi = st.kind === "slow" ? "Pelan-pelan" : st.kind === "fast" ? "Ngebut"
-               : st.kind === "delay" ? "Tunda berangkat" : "Singgah lebih lama";
-      stat = aksi + " bikin kapal lewat badai pas lebih reda. Risiko turun " + rp(Math.max(dRisk,0)) +
-             ", tambahan biaya " + rp(Math.max(dCost,0)) + ". " +
-             (net > 0 ? "Net hemat " + rp(net) + "." : "Belum sepadan, net " + rp(net) + ".");
-    }
-    return '<div class="' + cls + '">' +
-        '<div class="rc-top"><strong><span class="material-symbols-outlined rc-kind">' + ic + '</span>' + st.label + '</strong>' + badge + '</div>' +
-        '<div class="rc-rugi">' + rp(e.rp_total) + '<span>perkiraan biaya operasi + risiko badai</span></div>' +
-        '<div class="rc-grid">' +
-          cel("Biaya operasi", rp(e.rp_operasi)) + cel("Risiko badai", rp(e.risk.rp)) +
-          cel("Waktu total", jamStr(e.jam_total)) + cel("Tiba", e.tiba > WX.lastT + 1 ? "di luar prakiraan" : waktuStr(e.tiba)) +
-          cel("Badai maks", badaiMax) + cel("Emisi CO2", e.f.co2_ton.toFixed(1) + " ton") +
-        '</div>' +
-        hazardHtml(e.hazards) +
-        '<div class="rc-stat">' + stat + '</div></div>';
-  }
-  function routeHeaderHtml(route, jarakNm) {
-    return '<div class="rc-routehead"><div class="rc-routehead-top"><span class="material-symbols-outlined">route</span>' +
-      '<strong>' + route.nama + '</strong><span class="rc-routehead-km">' + jarakNm.toFixed(0) + ' nm</span></div>' +
-      transitHtml(route) +
-      '<div class="rc-routehead-note">Di laut jalurnya satu. Yang bisa diatur taktiknya kecepatan dan jadwal, biar lewat badai pas sudah reda.</div></div>';
-  }
-  function cel(k, v) { return '<div class="rc-cel"><span>' + k + '</span><b>' + v + '</b></div>'; }
-  function hazardHtml(hz) {
-    if (!hz || !hz.length) return '<div class="rc-haz rc-haz-clear"><span class="material-symbols-outlined">check_circle</span>Tidak ada zona badai atau hujan di jalur</div>';
-    var rows = hz.slice().sort(function (a, b) { return a.t - b.t; }).map(function (h) {
-      var isB = h.type === "badai", ic = isB ? "bolt" : "rainy", cls = isB ? "rc-haz-badai" : "rc-haz-hujan";
-      var jam = h.lewatPrakira ? "di luar jangkauan prakiraan" : h.waktu;
-      return '<div class="rc-haz-row ' + cls + '">' +
-        '<span class="material-symbols-outlined">' + ic + '</span>' +
-        '<div class="rc-haz-txt"><b>' + h.label + ' <i>' + hazValStr(h) + '</i></b>' +
-        '<span class="rc-haz-when"><span class="material-symbols-outlined">schedule</span>' + jam +
-        '<span class="material-symbols-outlined">resize</span>' + hazSizeStr(h) + '</span></div></div>';
-    }).join("");
-    return '<div class="rc-haz"><span class="label-caps">Cuaca sepanjang jalur (perkiraan waktu tiba)</span>' +
-           '<div class="rc-haz-rows">' + rows + '</div></div>';
-  }
-  function transitHtml(r) {
-    var s = r.stops || [];
-    if (s.length <= 2) return '';
-    var mid = s.slice(1, -1).map(function (id) { return portById(id).nama; });
-    return '<div class="rc-transit"><span class="label-caps">Singgah ' + mid.length + ' pelabuhan</span><div class="rc-transit-list">' +
-      portById(s[0]).nama + ' <b>›</b> ' + mid.join(' <b>›</b> ') + ' <b>›</b> ' + portById(s[s.length-1]).nama + '</div></div>';
-  }
+  /* cel, hazardHtml, dan transitHtml DIBUANG bersama kartu Taktik. */
 
-  /* ---- marker pelabuhan (asal/tujuan = jangkar emas, transit = kapal + badge).
-     SVG sementara; ganti ke icon isometric asli kalau zip-nya sudah ada (ICON_SHIP/ICON_ANCHOR). ---- */
   var ICON_SHIP = '<svg class="rm-svg" viewBox="0 0 64 44" width="22" height="15"><path d="M5 26h54l-7 12H12z" fill="#e05545"/><path d="M5 26h54l-2 4H7z" fill="#b93325"/><rect x="18" y="11" width="24" height="15" fill="#2d6cdf"/><rect x="18" y="11" width="24" height="3.5" fill="#4a86ff"/><rect x="22" y="5" width="11" height="7" fill="#eef2f7"/><rect x="43" y="16" width="10" height="10" fill="#5b9bf0"/></svg>';
   var ICON_ANCHOR = '<svg class="rm-svg" viewBox="0 0 24 24" width="19" height="19"><g fill="none" stroke="#f3c13a" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4" r="2.2"/><line x1="12" y1="6.2" x2="12" y2="20.5"/><line x1="7.4" y1="10" x2="16.6" y2="10"/><path d="M4.5 13A7.5 7.5 0 0 0 12 20.5 7.5 7.5 0 0 0 19.5 13"/><path d="M4.5 13 2.8 11M19.5 13 21.2 11"/></g></svg>';
   function portMarker(p, kind) {
@@ -507,26 +412,6 @@
       }
     });
     return out;
-  }
-  /* RISIKO BADAI (Rp): makin kuat CAPE + makin lama di dalamnya, makin besar risiko.
-     Patokan biaya = kelipatan sewa kapal per jam (K). Jujur ini PERKIRAAN, bukan klaim pasti. */
-  var RISK_K = 3;   // 1 jam di badai penuh ~ K jam sewa kapal (bisa disetel)
-  function exposureRisk(route, timing, harga) {
-    var wp = route.wp, c = cumNm(route), eta = etaFn(route, timing), v = timing.speed || 12;
-    var hourly = (harga.sewa / 24) * harga.kurs, rpv = 0, maxCape = 0, maxT = 0, nStorm = 0, nRain = 0, jamBadai = 0;
-    for (var i = 1; i < wp.length; i++) {
-      var segNm = c[i] - c[i-1]; if (!(segNm > 0)) continue;
-      var tmid = (eta(i-1) + eta(i)) / 2, lat = (wp[i][0] + wp[i-1][0]) / 2, lon = (wp[i][1] + wp[i-1][1]) / 2;
-      var cape = sampleScalarAt(WX.capeFrames, lat, lon, tmid), rain = sampleScalarAt(WX.rainFrames, lat, lon, tmid);
-      var sevC = Math.max(0, Math.min((cape - HZ.badai.lo) / (HZ.badai.hi - HZ.badai.lo), 1.5));
-      var sevR = Math.max(0, Math.min((rain - HZ.hujan.lo) / 18, 1)) * 0.5;
-      var hours = segNm / v;
-      rpv += (sevC + sevR) * hours * hourly * RISK_K;
-      if (cape >= HZ.badai.lo) { nStorm++; jamBadai += hours; }
-      if (rain >= HZ.hujan.lo) nRain++;
-      if (cape > maxCape) { maxCape = cape; maxT = tmid; }
-    }
-    return { rp: rpv, maxCape: Math.round(maxCape), maxT: maxT, nStorm: nStorm, nRain: nRain, jamBadai: jamBadai };
   }
   /* Zona bahaya jalur yang sedang tergambar. Dipakai baner rincian. */
   var HAZ = [];
@@ -659,7 +544,11 @@
   /* gambar SATU jalur (laut cuma 1 rute real) + zona badai menurut timing strategi REKOMENDASI */
   function gambarPeta(route, best, aPort, bPort) {
     bersihPeta();
-    var warna = "#51cf66";
+    /* Garis jalur PUTIH, bukan hijau. Petanya sekarang satu rona biru,
+       jadi garis berwarna apa pun yang masih kebiruan akan tenggelam di
+       dalamnya. Putih bergaris putus paling jelas terbaca sebagai jalur,
+       dan tidak bertabrakan dengan kuning jingga milik zona bahaya. */
+    var warna = "#ffffff";
     var line = L.polyline(route.wp, { color: warna, weight: 6, opacity: 0.95, dashArray: "8 7", lineCap: "round" }).addTo(map);
     line.bindTooltip(route.nama, { sticky: true }); lines.push(line);
     (route.stops || []).slice(1, -1).forEach(function (id) {
@@ -747,8 +636,11 @@
     el.innerHTML = '<div class="rt-tl">' +
       '<div class="rt-tl-head"><strong>' + esc(aPort.nama) + ' › ' + esc(bPort.nama) + '</strong>' +
         '<span class="rt-tl-sub">' + nmTot.toFixed(0) + ' nm · ' + timing.speed.toFixed(1) + ' kn · tiba ' + tiba + '</span>' +
-        '<div class="rt-tl-rec"><span class="rt-tl-reclbl">Rekomendasi ' + esc(best.st.label) + ' · ' + rp(best.rp_total) + '</span>' +
-        '<button type="button" id="rt-open-cards" class="rt-tl-open"><span class="material-symbols-outlined">dashboard</span> Taktik & biaya</button></div></div>' +
+        /* Satu angka saja: tambahan biaya BBM akibat cuaca, berikut
+           tambahan bahan bakarnya dalam ton. Tombol Taktik dan biaya
+           dibuang bersama banding strategi. */
+        '<div class="rt-tl-rec"><span class="rt-tl-reclbl">Tambahan BBM ' +
+          best.f.over_bunker_ton.toFixed(2) + ' ton · ' + rp(best.f.rp_bunker) + '</span></div></div>' +
       /* Relnya dibungkus wadah bergulir SENDIRI, bukan seluruh kartu.
          Kalau kartunya yang dilebarkan, judul jalur dan tombol Taktik ikut
          terdorong jauh ke kanan dan hilang dari layar.
@@ -802,8 +694,6 @@
   function tlMsg(html) {   // pesan/peringatan tampil di area timeline (kelihatan), kosongkan modal kartu
     var el = document.getElementById("rt-timeline"); if (el) el.innerHTML = html;
     requestAnimationFrame(ukurBawah);
-    var c = document.getElementById("rt-cards"); if (c) c.innerHTML = "";
-    closeCards();
   }
 
   /* ---- baca form ---- */
@@ -814,36 +704,33 @@
       kapal: { nama:(document.getElementById("rt-nama").value||"Kapal"), L_BWL:num("rt-L"), B:num("rt-B"), T:num("rt-T"),
                C_B:num("rt-CB"), V0:num("rt-V0"), FOC0:num("rt-FOC0"), SFOC:num("rt-SFOC"), eta_D:num("rt-etaD"), A_T:num("rt-AT"), C_X:num("rt-CX") },
       ambang: { hs:num("rt-ambHs"), angin:num("rt-ambAngin") },
-      harga: { bunker:num("rt-bunker"), kurs:num("rt-kurs"), sewa:num("rt-sewa"), rho_bahan:0.985 },
-      eta: num("rt-eta")
+      /* Sewa harian dan kompensasi laju DIBUANG 13 November 2026 bersama
+         keterlambatan. Feri menjaga jadwal, jadi tidak ada lagi pilihan
+         pelan hemat atau kejar jadwal, dan tidak ada biaya waktu. */
+      harga: { bunker:num("rt-bunker"), kurs:num("rt-kurs"), rho_bahan:0.985 }
     };
   }
 
   function jalankan() {
     if (!WX.loaded) { loadWx(jalankan); return; }   // muat cuaca asli sekali, lalu hitung
-    document.getElementById("rt-eta-val").textContent = num("rt-eta").toFixed(2);
     var aPort = portByIdN(comboPort(asalCombo())), bPort = portByIdN(comboPort(tujuanCombo()));
     if (!aPort || !bPort) {
       tlMsg(petunjukAwal());
       bersihPeta(); return;
     }
     var transits = readTransits();
-    if (aPort.id === bPort.id && !transits.length) { tlMsg('<div class="rute-tertahan"><span class="material-symbols-outlined">info</span><div><strong>Asal dan tujuan sama</strong>Pilih pelabuhan berbeda, atau tambah transit.</div></div>'); bersihPeta(); return; }
+    if (aPort.id === bPort.id && !transits.length) { tlMsg('<div class="rute-pesan"><span class="material-symbols-outlined">info</span><div><strong>Asal dan tujuan sama</strong>Pilih pelabuhan berbeda, atau tambah transit.</div></div>'); bersihPeta(); return; }
     var stops = [aPort].concat(transits).concat([bPort]);
     var routes = buildRoutes(stops);
     if (!routes.length) {   // ada ruas yang tak nyambung di jaringan real
-      tlMsg('<div class="rute-tertahan"><span class="material-symbols-outlined">block</span><div><strong>Belum ada rute</strong>Salah satu ruas belum punya jalur real yang nyambung. Coba ubah pelabuhan atau transitnya.</div></div>');
+      tlMsg('<div class="rute-pesan"><span class="material-symbols-outlined">block</span><div><strong>Belum ada rute</strong>Salah satu ruas belum punya jalur real yang nyambung. Coba ubah pelabuhan atau transitnya.</div></div>');
       bersihPeta(); return;
     }
     var fm = bacaForm();
     var route = routes[0];
-    var strat = buildStrategies(route, fm.kapal, fm.ambang, fm.eta, fm.harga);
-    var base = strat.semua.filter(function (e) { return e.st.kind === "normal"; })[0];
-    var html = routeHeaderHtml(route, route._sp.titik[route._sp.titik.length - 1].d);
-    html += strat.list.map(function (e) { return kartuHtml(e, base); }).join("");
-    document.getElementById("rt-cards").innerHTML = html;   // kartu taktik -> modal (dibuka tombol)
-    renderTimeline(route, strat.best, aPort, bPort);         // timeline rute di dok bawah
-    gambarPeta(route, strat.best, aPort, bPort);
+    var hasil = evalPelayaran(route, fm.kapal, fm.ambang, fm.harga);
+    renderTimeline(route, hasil, aPort, bPort);
+    gambarPeta(route, hasil, aPort, bPort);
     fillTransitList(route.stops);   // isi daftar transit dari pelabuhan yang dilewati rute
   }
 
@@ -874,8 +761,6 @@
     "rt-ambAngin": { title: "Batas angin", body: "Kecepatan angin paling tinggi yang masih dianggap aman. Lewat dari ini, jalur ditandai bahaya." },
     "rt-bunker": { title: "Harga bunker", body: "Harga bahan bakar kapal per ton dalam dolar. Dipakai menghitung biaya BBM." },
     "rt-kurs": { title: "Kurs", body: "Nilai tukar satu dolar ke rupiah. Dipakai mengubah biaya dolar jadi rupiah." },
-    "rt-sewa": { title: "Sewa harian", body: "Biaya sewa kapal per hari dalam dolar. Makin lama perjalanan makin besar biaya sewanya." },
-    "rt-eta": { title: "Kompensasi laju", body: "Pengatur condong ke hemat BBM atau kejar jadwal, dari 0 sampai 1. Makin ke 0 kapal pelan biar irit bahan bakar. Makin ke 1 kapal ngebut biar cepat sampai walau lebih boros." },
   };
   function showParam(id) {
     var d = NF_INFO[id], ov = document.getElementById("param-overlay"); if (!d || !ov) return;
@@ -1091,11 +976,9 @@
           nf("rt-SFOC","Konsumsi spesifik mesin","g/kWh","1","mesin") + nf("rt-etaD","Efisiensi propulsi","0-1","0.01","mesin") +
           nf("rt-AT","Luas kena angin","m2","10","mesin") + nf("rt-CX","Koefisien angin","","0.05","mesin") +
           '<div class="rt-grp-ttl">Ambang keselamatan</div>' + nf("rt-ambHs","Batas tinggi ombak","m","0.1","aman") + nf("rt-ambAngin","Batas angin","knot","1","aman") +
-          '<div class="rt-grp-ttl">Harga</div>' + nf("rt-bunker","Harga bunker","USD/ton","10","harga") + nf("rt-kurs","Kurs","Rp/USD","100","harga") + nf("rt-sewa","Sewa harian","USD/hari","100","harga") +
+          '<div class="rt-grp-ttl">Harga</div>' + nf("rt-bunker","Harga bunker","USD/ton","10","harga") + nf("rt-kurs","Kurs","Rp/USD","100","harga") +
         '</div>' +
 
-        '<div class="rt-field"><span class="label-caps">Kompensasi laju (eta) <b id="rt-eta-val">0.50</b><span class="rt-nf-info" data-info="rt-eta" role="button" tabindex="0" aria-label="Apa itu kompensasi laju">!</span></span>' +
-          '<input type="range" id="rt-eta" min="0" max="1" step="0.05" value="0.5" /><div class="rt-eta-cap"><span>santai hemat BBM</span><span>kejar jadwal</span></div></div>' +
 
         '<button id="rt-hitung" class="rt-go">Hitung rute</button>' +
       '</div></div>';
@@ -1118,9 +1001,6 @@
        sidebar. Akibatnya tombolnya tergambar rapi tapi diketuk tidak terjadi
        apa apa, tanpa galat di konsol sama sekali. Pendengarnya dipasang di
        wadah barunya. */
-    bawah.addEventListener("click", function (e) {
-      if (e.target.closest("#rt-open-cards")) openCards();
-    });
 
     /* Tombolnya menempel di TEPI KIRI SIDEBAR, bukan di panel bawah.
        Diminta pemilik 5 November 2026. Ditaruh di sidebar sebab sidebar
@@ -1134,23 +1014,12 @@
     tx.addEventListener("click", toggleBawah);
     aside.appendChild(tx);
 
-    /* modal kartu taktik (tengah layar), dibuka tombol "Taktik & biaya" di timeline */
-    var modal = document.createElement("div");
-    modal.id = "rt-cards-modal"; modal.className = "rt-modal"; modal.hidden = true;
-    modal.innerHTML = '<div class="rt-modal-back"></div><div class="rt-modal-box">' +
-      '<button type="button" class="rt-modal-x" id="rt-cards-x"><span class="material-symbols-outlined">close</span></button>' +
-      '<div class="rt-cards" id="rt-cards"></div></div>';
-    document.getElementById("stage").appendChild(modal);
-    modal.addEventListener("click", function (e) {
-      if (e.target.closest(".rt-modal-x") || e.target.classList.contains("rt-modal-back")) closeCards();
-    });
-
     buildGraph();
     /* KOSONG di awal, diminta pemilik. Dulu asal dan tujuan diisikan
        Surabaya ke Ujung Pandang dan kapalnya dipilihkan feri, jadi peta
        langsung menggambar jalur yang bukan punya siapa siapa. Harga bunker,
        kurs, dan sewa TETAP diisi, itu angka pasar bukan parameter kapal. */
-    setVal("rt-bunker", FMS.HARGA.bunker); setVal("rt-kurs", FMS.HARGA.kurs); setVal("rt-sewa", FMS.HARGA.sewa);
+    setVal("rt-bunker", FMS.HARGA.bunker); setVal("rt-kurs", FMS.HARGA.kurs);
     tlMsg(petunjukAwal());
 
     aside.querySelector("#rt-jenis").addEventListener("change", function () {
@@ -1161,7 +1030,6 @@
     aside.addEventListener("click", function (e) { var b = e.target.closest(".rt-nf-info"); if (!b) return; e.preventDefault(); e.stopPropagation(); showParam(b.dataset.info); });
     aside.addEventListener("keydown", function (e) { if ((e.key === "Enter" || e.key === " ") && e.target.classList.contains("rt-nf-info")) { e.preventDefault(); showParam(e.target.dataset.info); } });
     aside.querySelector("#rt-hitung").addEventListener("click", jalankan);
-    aside.querySelector("#rt-eta").addEventListener("input", function () { document.getElementById("rt-eta-val").textContent = parseFloat(this.value).toFixed(2); });
     /* Identitas DIPINDAHKAN, bukan disalin. appendChild memindahkan simpul
        yang sudah ada beserta pendengarnya, jadi tombol Tentang tetap jalan. */
     var ident = aside.querySelector("#rt-ident");
@@ -1197,15 +1065,13 @@
       pickCombo(opt.closest(".rt-combo"), opt.getAttribute("data-id"));
     });
     aside.addEventListener("click", function (e) {
-      if (e.target.closest("#rt-open-cards")) { openCards(); return; }
       if (e.target.closest("#rt-add-transit")) { addTransitRow(true); return; }
       var del = e.target.closest(".rt-transit-del");
       if (del) { var row = del.closest(".rt-transit-row"); if (row) row.remove(); jalankan(); }
     });
     return aside;
   }
-  function openCards() { var m = document.getElementById("rt-cards-modal"); if (m) m.hidden = false; }
-  function closeCards() { var m = document.getElementById("rt-cards-modal"); if (m) m.hidden = true; }
+
 
   var panel = null, aktif = false;
   /* tinggi panel bawah yg nutup peta (0 kalau tutup) -> buat reframe + padding fitBounds */
