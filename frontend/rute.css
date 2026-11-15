@@ -235,7 +235,12 @@
 
 /* Marker pelabuhan rute: asal/tujuan = jangkar emas, transit = kapal + badge */
 .rm-wrap { background: none !important; border: none !important; }
-.rm { display: flex; flex-direction: column; align-items: center; gap: 2px; width: 160px; pointer-events: none; }
+/* JANGAN kasih .rm lebar tetap. Dulu 160px, sisa zaman penanda masih
+   membawa lencana dan nama. Isinya tinggal ikon, tapi lebarnya masih
+   160px dan align-items:center menaruh ikonnya di tengah kotak itu,
+   jadi jangkar asal dan tujuan meleset 70 piksel ke timur dari titik
+   pelabuhannya. Ikon bahaya tidak kena sebab .hz tidak berlebar. */
+.rm { display: flex; flex-direction: column; align-items: center; gap: 2px; line-height: 0; pointer-events: none; }
 .rm-badge { font-family: var(--font-mono, ui-monospace, monospace); font-size: 9px; font-weight: 700; letter-spacing: .09em; background: #9698ff; color: #0a1018; padding: 2px 7px; border-radius: 7px; box-shadow: 0 1px 4px rgba(0,0,0,.5); }
 .rm-badge-gold { background: #f3c13a; }
 .rm-name { font-size: 11px; font-weight: 600; color: #fff; text-shadow: 0 1px 3px #000, 0 0 3px #000; white-space: nowrap; max-width: 150px; overflow: hidden; text-overflow: ellipsis; }
@@ -909,3 +914,52 @@
   border-color: rgba(22, 121, 171, .4);
 }
 .rc-haz-clear .material-symbols-outlined { color: var(--aksen); }
+
+
+/* ===== Laci biaya BBM di tepi kanan, 15 November 2026 ===== */
+.rt-biaya {
+  position: absolute; top: 74px; right: var(--rt-sidebar);
+  width: 318px; max-width: calc(100vw - 34px);
+  z-index: 650;                      /* DI BAWAH sidebar (700), itu kuncinya */
+  transform: translateX(calc(100% + 34px));
+  transition: transform .42s cubic-bezier(.33, 1, .68, 1);
+}
+.rt-biaya.ada { transform: translateX(100%); }
+.rt-biaya.ada.buka { transform: translateX(0); }
+.rt-biaya-x {
+  position: absolute; left: -30px; top: 12px;
+  width: 30px; padding: 12px 0 14px; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 7px;
+  background: rgba(22, 121, 171, .78); color: #fff; border: 0;
+  border-radius: 4px 0 0 4px; box-shadow: none;
+  -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+}
+.rt-biaya-x:hover { background: rgba(22, 121, 171, .95); }
+.rt-biaya-x .material-symbols-outlined { font-size: 17px; line-height: 1; transition: transform .3s ease; }
+.rt-biaya.buka .rt-biaya-x .material-symbols-outlined { transform: rotate(180deg); }
+.rt-biaya-lbl {
+  writing-mode: vertical-rl; font-family: var(--font-ui);
+  font-size: 10.5px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase;
+}
+.rb-isi { max-height: calc(100vh - 150px); overflow-y: auto; scrollbar-width: thin; }
+
+.rb-kartu { width: auto; padding: 18px 20px 16px; }
+.rb-kartu .rt-haz-tag { display: block; padding-right: 8px; color: var(--aksen); }
+.rb-nilai { font-size: 30px; margin: 6px 0 6px; }
+.rb-jalur { font-size: 11.5px; color: var(--ink-50); margin-bottom: 13px; line-height: 1.5; }
+.rb-notif { margin-top: 13px; padding-top: 11px; border-top: var(--bw) solid var(--ink-20); font-size: 11.5px; color: var(--ink); }
+.rb-notif b { display: block; margin-bottom: 7px; font-size: 8.5px; font-weight: 400; letter-spacing: .13em; text-transform: uppercase; color: var(--ink-50); }
+.rb-notif-it { display: inline-flex; align-items: center; gap: 5px; margin: 0 12px 4px 0; }
+.rb-notif-it .material-symbols-outlined { font-size: 16px; color: #c98a00; }
+.rb-notif i { display: block; margin-top: 6px; font-style: normal; font-size: 10.5px; color: var(--ink-50); }
+.rb-kaki { margin: 12px 0 0; font-size: 10.5px; line-height: 1.55; color: var(--ink-50); }
+.rt-tl-reclbl--btn { display: inline-flex; align-items: center; gap: 6px; background: none; border: 0; padding: 0; cursor: pointer; font: inherit; color: inherit; }
+.rt-tl-reclbl--btn .material-symbols-outlined { font-size: 14px; opacity: .7; }
+.rt-tl-reclbl--btn:hover .material-symbols-outlined { opacity: 1; }
+
+/* Di HP sidebar berubah jadi lembar bawah, jadi lacinya menempel ke tepi
+   kanan layar dan sembunyinya ke luar layar, bukan ke balik sidebar. */
+@media (max-width: 900px) {
+  .rt-biaya { right: 0; top: 64px; width: 300px; }
+  .rb-isi { max-height: 46vh; }
+}

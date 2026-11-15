@@ -535,6 +535,95 @@
       .bindPopup(kartu, { className: "pt-pop", closeButton: true, autoPan: true, maxWidth: 300 });
   }
 
+  /* ===================================================================
+     KARTU BIAYA DI TENGAH LAYAR, 15 November 2026, diminta pemilik.
+     Sebelumnya hasilnya cuma satu baris tulisan di pojok kanan atas panel
+     bawah dan gampang terlewat. Sekarang muncul sendiri begitu Hitung rute
+     ditekan, dan bisa dibuka lagi lewat ringkasan itu.
+
+     Isinya cuma biaya BBM. Potensi badai dan ambang keselamatan ikut
+     ditampilkan di bawah sebagai NOTIFIKASI, sengaja dipisahkan dan tanpa
+     angka rupiah.
+     =================================================================== */
+  function biayaKartuHtml(route, hasil, aPort, bPort, kapal) {
+    var f = hasil.f;
+    var lama = f.jam >= 24 ? (f.jam / 24).toFixed(1) + " hari" : f.jam.toFixed(1) + " jam";
+
+    var hz = hasil.hazards || [];
+    var nBadai = 0, i;
+    for (i = 0; i < hz.length; i++) if (hz[i].type === "badai") nBadai++;
+    var nHujan = hz.length - nBadai;
+
+    var notif = "";
+    if (nBadai || nHujan) {
+      var baris = "";
+      if (nBadai) baris += '<span class="rb-notif-it"><span class="material-symbols-outlined">bolt</span>' +
+        nBadai + ' zona potensi badai</span>';
+      if (nHujan) baris += '<span class="rb-notif-it"><span class="material-symbols-outlined">rainy</span>' +
+        nHujan + ' zona hujan</span>';
+      notif = '<div class="rb-notif"><b>Notifikasi risiko fisik</b>' + baris +
+        '<i>Tidak dihitung sebagai rupiah. Keputusan berlayar tetap di tanganmu.</i></div>';
+    }
+
+    return '<div class="pt-bento rb-kartu">' +
+      '<span class="rt-haz-tag">Tambahan biaya BBM akibat cuaca</span>' +
+      '<div class="rt-haz-nilai rb-nilai">' + rp(f.rp_bunker) + '</div>' +
+      '<div class="rb-jalur">' + esc(aPort.nama) + ' &rsaquo; ' + esc(bPort.nama) +
+        ' &middot; ' + esc(kapal.nama || "") + ' &middot; ' + hasil.st.speed.toFixed(1) + ' kn</div>' +
+      '<div class="rt-haz-kisi">' +
+        '<div><b>Tambahan bahan bakar</b>' + f.over_bunker_ton.toFixed(2) + ' ton</div>' +
+        '<div><b>Tambahan emisi</b>' + f.co2_ton.toFixed(2) + ' ton CO&#8322;</div>' +
+        '<div><b>Jarak</b>' + f.jarak_nm.toFixed(0) + ' nm</div>' +
+        '<div><b>Lama pelayaran</b>' + lama + '</div>' +
+        '<div class="rt-haz-lebar"><b>Rasio hambatan tambahan</b>rata rata ' +
+          f.r_rata.toFixed(2) + ', tertinggi ' + f.r_maks.toFixed(2) + '</div>' +
+      '</div>' + notif +
+      '<p class="rb-kaki">Dihitung dari kondisi laut di sepanjang jalur. Feri dianggap ' +
+      'menjaga jadwal, jadi mesin menambah daya dan bahan bakarnya naik. Keterlambatan ' +
+      'dan biaya sewa di luar lingkup perhitungan ini.</p>' +
+      '</div>';
+  }
+
+  /* ===================================================================
+     LACI BIAYA DI TEPI KANAN, 15 November 2026, diminta pemilik.
+     Semula kartunya muncul di tengah layar sebagai pop up berlatar buram.
+     Sekarang dia laci yang keluar dari BALIK sidebar kanan ke kiri, dan
+     bisa didorong balik lewat tombol "Biaya BBM" di tepi kirinya.
+
+     z-index laci SENGAJA di bawah sidebar (650 lawan 700), itu yang bikin
+     dia hilang ke belakang sidebar waktu didorong balik, bukan display none.
+     Tiga keadaan, tanpa kelas = ikut tombolnya ikut sembunyi (sebelum ada
+     hitungan), .ada = tombol muncul kartunya tersimpan, .ada.buka = keluar.
+     =================================================================== */
+  function laciBiaya() { return document.getElementById("rt-biaya"); }
+  function bukaBiaya() { var m = laciBiaya(); if (m) m.classList.add("ada", "buka"); }
+  function tutupBiaya() { var m = laciBiaya(); if (m) m.classList.remove("buka"); }
+  function lepasBiaya() { var m = laciBiaya(); if (m) m.classList.remove("ada", "buka"); }
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") tutupBiaya(); });
+
+  function tampilBiaya(route, hasil, aPort, bPort, kapal) {
+    var m = laciBiaya();
+    if (!m) {
+      m = document.createElement("div");
+      m.id = "rt-biaya"; m.className = "rt-biaya";
+      m.innerHTML = '<button type="button" class="rt-biaya-x" aria-label="Buka tutup biaya BBM">' +
+        '<span class="material-symbols-outlined">chevron_left</span>' +
+        '<span class="rt-biaya-lbl">Biaya BBM</span></button>' +
+        '<div class="rb-isi"></div>';
+      document.getElementById("stage").appendChild(m);
+      m.querySelector(".rt-biaya-x").addEventListener("click", function () {
+        m.classList.toggle("buka");
+      });
+    }
+    m.querySelector(".rb-isi").innerHTML = biayaKartuHtml(route, hasil, aPort, bPort, kapal);
+    m.classList.add("ada", "buka");
+  }
+  /* Lebar laci yang betul betul menutupi peta, 0 kalau sedang tersimpan. */
+  function laciPx() {
+    var m = laciBiaya();
+    return (m && m.classList.contains("buka")) ? Math.round(m.getBoundingClientRect().width) : 0;
+  }
+
   /* ---- peta ---- */
   var lines = [], marks = [];
   function bersihPeta() {
@@ -574,8 +663,12 @@
     marks.push(portMarker(aPort, "asal").addTo(map));
     marks.push(portMarker(bPort, "tujuan").addTo(map));
     if (route.wp.length) {
-      var cover = panelCoverPx();   // sisakan ruang buat panel bawah biar rute ga ketutup
-      map.fitBounds(L.latLngBounds(route.wp).pad(0.12), { paddingBottomRight: L.point(0, cover), animate: false });
+      /* Sisakan ruang buat panel bawah DAN tepi kanan yang ketutup sidebar
+         plus laci biaya. Tanpa bagian kanan, jalurnya di-fit ke lebar penuh
+         jendela lalu separuh ujungnya ngumpet di balik sidebar. */
+      var cover = panelCoverPx(), kanan = sidebarPx() + laciPx();
+      map.fitBounds(L.latLngBounds(route.wp).pad(0.12),
+                    { paddingBottomRight: L.point(kanan, cover), animate: true, duration: 0.9 });
     }
   }
 
@@ -639,8 +732,11 @@
         /* Satu angka saja: tambahan biaya BBM akibat cuaca, berikut
            tambahan bahan bakarnya dalam ton. Tombol Taktik dan biaya
            dibuang bersama banding strategi. */
-        '<div class="rt-tl-rec"><span class="rt-tl-reclbl">Tambahan BBM ' +
-          best.f.over_bunker_ton.toFixed(2) + ' ton · ' + rp(best.f.rp_bunker) + '</span></div></div>' +
+        /* Ringkasannya bisa diketuk untuk memunculkan kembali kartu biaya
+           yang muncul sendiri sesudah Hitung rute ditekan. */
+        '<div class="rt-tl-rec"><button type="button" id="rt-buka-biaya" class="rt-tl-reclbl rt-tl-reclbl--btn">' +
+          'Tambahan BBM ' + best.f.over_bunker_ton.toFixed(2) + ' ton · ' + rp(best.f.rp_bunker) +
+          '<span class="material-symbols-outlined">open_in_full</span></button></div></div>' +
       /* Relnya dibungkus wadah bergulir SENDIRI, bukan seluruh kartu.
          Kalau kartunya yang dilebarkan, judul jalur dan tombol Taktik ikut
          terdorong jauh ke kanan dan hilang dari layar.
@@ -716,20 +812,27 @@
     var aPort = portByIdN(comboPort(asalCombo())), bPort = portByIdN(comboPort(tujuanCombo()));
     if (!aPort || !bPort) {
       tlMsg(petunjukAwal());
-      bersihPeta(); return;
+      bersihPeta(); lepasBiaya(); return;
     }
     var transits = readTransits();
-    if (aPort.id === bPort.id && !transits.length) { tlMsg('<div class="rute-pesan"><span class="material-symbols-outlined">info</span><div><strong>Asal dan tujuan sama</strong>Pilih pelabuhan berbeda, atau tambah transit.</div></div>'); bersihPeta(); return; }
+    if (aPort.id === bPort.id && !transits.length) { tlMsg('<div class="rute-pesan"><span class="material-symbols-outlined">info</span><div><strong>Asal dan tujuan sama</strong>Pilih pelabuhan berbeda, atau tambah transit.</div></div>'); bersihPeta(); lepasBiaya(); return; }
     var stops = [aPort].concat(transits).concat([bPort]);
     var routes = buildRoutes(stops);
     if (!routes.length) {   // ada ruas yang tak nyambung di jaringan real
       tlMsg('<div class="rute-pesan"><span class="material-symbols-outlined">block</span><div><strong>Belum ada rute</strong>Salah satu ruas belum punya jalur real yang nyambung. Coba ubah pelabuhan atau transitnya.</div></div>');
-      bersihPeta(); return;
+      bersihPeta(); lepasBiaya(); return;
     }
     var fm = bacaForm();
+    /* Tanpa jenis kapal semua dimensi masih nol, dan pembagian dengan nol
+       membuat kartunya menulis Rp NaN dan 157,8 hari. Dihentikan di sini. */
+    if (!(fm.kapal.V0 > 0) || !(fm.kapal.FOC0 > 0) || !(fm.kapal.L_BWL > 0)) {
+      tlMsg('<div class="rute-pesan"><span class="material-symbols-outlined">directions_boat</span><div><strong>Pilih jenis kapal</strong>Dimensi dan konsumsi BBM masih kosong, jadi biayanya belum bisa dihitung.</div></div>');
+      bersihPeta(); lepasBiaya(); return;
+    }
     var route = routes[0];
     var hasil = evalPelayaran(route, fm.kapal, fm.ambang, fm.harga);
     renderTimeline(route, hasil, aPort, bPort);
+    tampilBiaya(route, hasil, aPort, bPort, fm.kapal);
     gambarPeta(route, hasil, aPort, bPort);
     fillTransitList(route.stops);   // isi daftar transit dari pelabuhan yang dilewati rute
   }
@@ -995,6 +1098,11 @@
        muncul selama belum ada jalur. */
     bawah.innerHTML = '<div id="rt-timeline"></div>';
     document.getElementById("stage").appendChild(bawah);
+
+    /* Ringkasan biaya di kepala garis waktu membuka lagi kartunya. */
+    bawah.addEventListener("click", function (e) {
+      if (e.target.closest("#rt-buka-biaya")) bukaBiaya();
+    });
 
     /* Tombol Taktik dan biaya ikut pindah ke panel bawah waktu panel rute
        dibelah 5 November 2026, sedangkan pendengar kliknya tertinggal di
